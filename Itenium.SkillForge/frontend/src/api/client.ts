@@ -39,7 +39,7 @@ export async function loginApi(username: string, password: string): Promise<Logi
   params.append('username', username);
   params.append('password', password);
   params.append('client_id', 'skillforge-spa');
-  params.append('scope', 'openid profile email');
+  params.append('scope', 'openid profile email roles');
 
   const response = await axios.post<LoginResponse>(`${API_BASE_URL}/connect/token`, params, {
     headers: {
@@ -82,6 +82,11 @@ export interface User {
   teamIds: number[];
 }
 
+export interface ArchivedUser extends User {
+  archivedAt: string;
+  archivedBy: string;
+}
+
 export interface CreateUserRequest {
   firstName: string;
   lastName: string;
@@ -98,5 +103,24 @@ export async function fetchUsers(): Promise<User[]> {
 
 export async function createUser(request: CreateUserRequest): Promise<User> {
   const response = await api.post<User>('/api/user', request);
+  return response.data;
+}
+
+export async function archiveUser(id: string): Promise<void> {
+  await api.delete(`/api/user/${id}`);
+}
+
+export async function fetchArchivedUsers(): Promise<ArchivedUser[]> {
+  const response = await api.get<ArchivedUser[]>('/api/user/archived');
+  return response.data;
+}
+
+export async function restoreUser(id: string): Promise<User> {
+  const response = await api.post<User>(`/api/user/${id}/restore`);
+  return response.data;
+}
+
+export async function fetchUncoachedUsers(): Promise<User[]> {
+  const response = await api.get<User[]>('/api/user/uncoached');
   return response.data;
 }

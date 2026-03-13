@@ -2,7 +2,18 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Input } from '@itenium-forge/ui';
-import { fetchUsers, fetchUserTeams, createUser, type User, type CreateUserRequest } from '@/api/client';
+import {
+  fetchUsers,
+  fetchUserTeams,
+  createUser,
+  archiveUser,
+  fetchArchivedUsers,
+  restoreUser,
+  fetchUncoachedUsers,
+  type User,
+  type ArchivedUser,
+  type CreateUserRequest,
+} from '@/api/client';
 
 const ROLES = ['backoffice', 'manager', 'learner'] as const;
 
@@ -19,6 +30,8 @@ export function Users() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
+  const [showUncoached, setShowUncoached] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
   const { data: users, isLoading } = useQuery<User[]>({
@@ -31,12 +44,42 @@ export function Users() {
     queryFn: fetchUserTeams,
   });
 
-  const mutation = useMutation({
+  const { data: archivedUsers } = useQuery<ArchivedUser[]>({
+    queryKey: ['users', 'archived'],
+    queryFn: fetchArchivedUsers,
+    enabled: showArchived,
+  });
+
+  const { data: uncoachedUsers } = useQuery({
+    queryKey: ['users', 'uncoached'],
+    queryFn: fetchUncoachedUsers,
+    enabled: showUncoached,
+  });
+
+  const createMutation = useMutation({
     mutationFn: createUser,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setShowForm(false);
       setForm(emptyForm);
+    },
+  });
+
+  const archiveMutation = useMutation({
+    mutationFn: archiveUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['users', 'archived'] });
+      queryClient.invalidateQueries({ queryKey: ['users', 'uncoached'] });
+    },
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: restoreUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['users', 'archived'] });
+      queryClient.invalidateQueries({ queryKey: ['users', 'uncoached'] });
     },
   });
 
@@ -49,7 +92,7 @@ export function Users() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutation.mutate(form);
+    createMutation.mutate(form);
   };
 
   if (isLoading) {
@@ -135,8 +178,8 @@ export function Users() {
               />
             </div>
             <div className="flex gap-2">
-              <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? t('common.loading') : t('common.save')}
+              <Button type="submit" disabled={createMutation.isPending}>
+                {createMutation.isPending ? t('common.loading') : t('common.save')}
               </Button>
               <Button
                 type="button"
@@ -149,11 +192,12 @@ export function Users() {
                 {t('common.cancel')}
               </Button>
             </div>
-            {mutation.isError && <p className="text-sm text-destructive">{t('common.error')}</p>}
+            {createMutation.isError && <p className="text-sm text-destructive">{t('common.error')}</p>}
           </form>
         </div>
       )}
 
+      {/* Active Users Table */}
       <div className="rounded-md border">
         <table className="w-full">
           <thead>
@@ -162,6 +206,7 @@ export function Users() {
               <th className="p-3 text-left font-medium">{t('users.email')}</th>
               <th className="p-3 text-left font-medium">{t('users.role')}</th>
               <th className="p-3 text-left font-medium">{t('users.teams')}</th>
+              <th className="p-3 text-left font-medium"></th>
             </tr>
           </thead>
           <tbody>
@@ -175,17 +220,120 @@ export function Users() {
                 <td className="p-3 text-muted-foreground">
                   {user.teamIds.map((id) => teams?.find((t) => t.id === id)?.name ?? id).join(', ') || '-'}
                 </td>
+                <td className="p-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => archiveMutation.mutate(user.id)}
+                    disabled={archiveMutation.isPending}
+                  >
+                    {t('users.archive')}
+                  </Button>
+                </td>
               </tr>
             ))}
             {users?.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-3 text-center text-muted-foreground">
+                <td colSpan={5} className="p-3 text-center text-muted-foreground">
                   {t('users.noUsers')}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Archived Users Section */}
+      <div>
+        <Button variant="outline" onClick={() => setShowArchived(!showArchived)}>
+          {showArchived ? t('users.hideArchived') : t('users.showArchived')}
+        </Button>
+        {showArchived && (
+          <div className="mt-4 rounded-md border">
+            <div className="p-3 bg-muted/50 font-medium border-b">{t('users.archivedUsers')}</div>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b bg-muted/30">
+                  <th className="p-3 text-left font-medium">{t('users.name')}</th>
+                  <th className="p-3 text-left font-medium">{t('users.email')}</th>
+                  <th className="p-3 text-left font-medium">{t('users.role')}</th>
+                  <th className="p-3 text-left font-medium">{t('users.archivedAt')}</th>
+                  <th className="p-3 text-left font-medium"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {archivedUsers?.map((user) => (
+                  <tr key={user.id} className="border-b opacity-70">
+                    <td className="p-3">
+                      {user.firstName} {user.lastName}
+                    </td>
+                    <td className="p-3 text-muted-foreground">{user.email}</td>
+                    <td className="p-3">{t(`users.roles.${user.role}`) || user.role}</td>
+                    <td className="p-3 text-muted-foreground">{new Date(user.archivedAt).toLocaleDateString()}</td>
+                    <td className="p-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => restoreMutation.mutate(user.id)}
+                        disabled={restoreMutation.isPending}
+                      >
+                        {t('users.restore')}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+                {archivedUsers?.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="p-3 text-center text-muted-foreground">
+                      {t('users.noArchivedUsers')}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Uncoached Consultants Section (SF-33) */}
+      <div>
+        <Button variant="outline" onClick={() => setShowUncoached(!showUncoached)}>
+          {showUncoached ? t('users.hideUncoached') : t('users.showUncoached')}
+        </Button>
+        {showUncoached && (
+          <div className="mt-4 rounded-md border">
+            <div className="p-3 bg-muted/50 font-medium border-b">{t('users.uncoachedUsers')}</div>
+            <table className="w-full">
+              <thead>
+                <tr className="border-b bg-muted/30">
+                  <th className="p-3 text-left font-medium">{t('users.name')}</th>
+                  <th className="p-3 text-left font-medium">{t('users.email')}</th>
+                  <th className="p-3 text-left font-medium">{t('users.teams')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {uncoachedUsers?.map((user) => (
+                  <tr key={user.id} className="border-b">
+                    <td className="p-3">
+                      {user.firstName} {user.lastName}
+                    </td>
+                    <td className="p-3 text-muted-foreground">{user.email}</td>
+                    <td className="p-3 text-muted-foreground">
+                      {user.teamIds.map((id) => teams?.find((t) => t.id === id)?.name ?? id).join(', ') || '-'}
+                    </td>
+                  </tr>
+                ))}
+                {uncoachedUsers?.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="p-3 text-center text-muted-foreground">
+                      {t('users.noUncoachedUsers')}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
