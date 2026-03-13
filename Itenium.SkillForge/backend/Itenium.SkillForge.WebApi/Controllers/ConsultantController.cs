@@ -178,8 +178,11 @@ public class ConsultantController : ControllerBase
                 .Select(p => new SkillPrerequisiteDto(p.RequiredSkillId, p.RequiredSkill.Name, p.RequiredLevel))
                 .ToList();
 
-            return new RoadmapSkillDto(skill.Id, skill.Name, skill.Category, skill.Description, skill.LevelCount, unmetPrereqs);
+            return new RoadmapSkillDto(skill.Id, skill.Name, skill.Category, skill.Description, skill.LevelCount, unmetPrereqs, false);
         }).ToList();
+
+        var defaultViewIds = ComputeDefaultView(roadmapSkills, currentLevels);
+        roadmapSkills = roadmapSkills.Select(s => s with { IsInDefaultView = defaultViewIds.Contains(s.Id) }).ToList();
 
         var categories = roadmapSkills
             .GroupBy(s => s.Category, StringComparer.Ordinal)
@@ -188,5 +191,37 @@ public class ConsultantController : ControllerBase
             .ToList();
 
         return Ok(categories);
+    }
+
+    private static HashSet<int> ComputeDefaultView(
+        IReadOnlyList<RoadmapSkillDto> skills,
+        Dictionary<int, int> currentLevels)
+    {
+        var defaultIds = new HashSet<int>();
+
+        // Phase 1: anchors (in progress) + next-tier (all prerequisites met)
+        foreach (var skill in skills)
+        {
+            var currentLevel = currentLevels.GetValueOrDefault(skill.Id, 0);
+            if (currentLevel > 0 || skill.UnmetPrerequisites.Count == 0)
+                defaultIds.Add(skill.Id);
+        }
+
+        // Phase 2: pad to 8 by adding most accessible remaining skills
+        if (defaultIds.Count < 8)
+        {
+            var remaining = skills
+                .Where(s => !defaultIds.Contains(s.Id))
+                .OrderBy(s => s.UnmetPrerequisites.Count)
+                .ThenBy(s => s.Name, StringComparer.Ordinal);
+
+            foreach (var skill in remaining)
+            {
+                if (defaultIds.Count >= 8) break;
+                defaultIds.Add(skill.Id);
+            }
+        }
+
+        return defaultIds;
     }
 }

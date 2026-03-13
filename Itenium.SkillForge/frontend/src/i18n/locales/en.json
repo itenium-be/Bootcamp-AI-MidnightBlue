@@ -153,7 +153,9 @@
     "profileSaved": "Profile saved",
     "skillRoadmap": "Skill Roadmap",
     "noRoadmap": "Assign a competence centre profile to see the skill roadmap.",
-    "prerequisiteWarning": "Prerequisites not yet met"
+    "prerequisiteWarning": "Prerequisites not yet met",
+    "showAll": "Show all ({{count}})",
+    "showLess": "Show less"
   },
   "resources": {
     "title": "Resource Library",

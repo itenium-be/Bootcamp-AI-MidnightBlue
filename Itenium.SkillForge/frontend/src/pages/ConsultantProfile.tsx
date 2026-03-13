@@ -45,6 +45,49 @@ export function RoadmapSkillRow({ skill }: { skill: RoadmapSkill }) {
   );
 }
 
+function RoadmapView({ categories }: { categories: RoadmapCategory[] }) {
+  const { t } = useTranslation();
+  const [showAll, setShowAll] = useState(false);
+
+  const totalSkills = categories.reduce((sum, cat) => sum + cat.skills.length, 0);
+  const defaultSkillCount = categories.reduce(
+    (sum, cat) => sum + cat.skills.filter((s) => s.isInDefaultView).length,
+    0,
+  );
+  const hasHidden = totalSkills > defaultSkillCount;
+
+  const visibleCategories = showAll
+    ? categories
+    : categories
+        .map((cat) => ({ ...cat, skills: cat.skills.filter((s) => s.isInDefaultView) }))
+        .filter((cat) => cat.skills.length > 0);
+
+  return (
+    <div className="space-y-4">
+      {visibleCategories.map((cat) => (
+        <div key={cat.category}>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">{cat.category}</h3>
+          <ul className="space-y-1">
+            {cat.skills.map((skill) => (
+              <RoadmapSkillRow key={skill.id} skill={skill} />
+            ))}
+          </ul>
+        </div>
+      ))}
+      {hasHidden && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full text-muted-foreground"
+          onClick={() => setShowAll((s) => !s)}
+        >
+          {showAll ? t('consultant.showLess') : t('consultant.showAll', { count: totalSkills })}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 interface ConsultantProfileProps {
   userId: string;
 }
@@ -247,20 +290,7 @@ export function ConsultantProfile({ userId }: ConsultantProfileProps) {
         ) : !roadmapCategories || roadmapCategories.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
         ) : (
-          <div className="space-y-4">
-            {roadmapCategories.map((cat) => (
-              <div key={cat.category}>
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-                  {cat.category}
-                </h3>
-                <ul className="space-y-1">
-                  {cat.skills.map((skill) => (
-                    <RoadmapSkillRow key={skill.id} skill={skill} />
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          <RoadmapView categories={roadmapCategories} />
         )}
       </div>
     </div>
