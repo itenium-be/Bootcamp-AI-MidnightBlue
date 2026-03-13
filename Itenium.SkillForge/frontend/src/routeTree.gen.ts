@@ -13,6 +13,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSkillsRouteImport } from './routes/_authenticated/skills'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
 import { Route as AuthenticatedCoursesRouteImport } from './routes/_authenticated/courses'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as AuthenticatedTeamMembersRouteImport } from './routes/_authenticated/team.members'
@@ -35,6 +36,11 @@ const AuthenticatedSkillsRoute = AuthenticatedSkillsRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCoursesRoute = AuthenticatedCoursesRouteImport.update({
@@ -63,6 +69,7 @@ const AuthenticatedConsultantUserIdRoute =
 export interface FileRoutesByFullPath {
   '/sign-in': typeof authSignInRoute
   '/courses': typeof AuthenticatedCoursesRoute
+  '/resources': typeof AuthenticatedResourcesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/skills': typeof AuthenticatedSkillsRoute
   '/': typeof AuthenticatedIndexRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/sign-in': typeof authSignInRoute
   '/courses': typeof AuthenticatedCoursesRoute
+  '/resources': typeof AuthenticatedResourcesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/skills': typeof AuthenticatedSkillsRoute
   '/': typeof AuthenticatedIndexRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/(auth)/sign-in': typeof authSignInRoute
   '/_authenticated/courses': typeof AuthenticatedCoursesRoute
+  '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/skills': typeof AuthenticatedSkillsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/sign-in'
     | '/courses'
+    | '/resources'
     | '/settings'
     | '/skills'
     | '/'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
   to:
     | '/sign-in'
     | '/courses'
+    | '/resources'
     | '/settings'
     | '/skills'
     | '/'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/(auth)/sign-in'
     | '/_authenticated/courses'
+    | '/_authenticated/resources'
     | '/_authenticated/settings'
     | '/_authenticated/skills'
     | '/_authenticated/'
@@ -155,6 +167,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/resources': {
+      id: '/_authenticated/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof AuthenticatedResourcesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/courses': {
       id: '/_authenticated/courses'
       path: '/courses'
@@ -188,6 +207,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCoursesRoute: typeof AuthenticatedCoursesRoute
+  AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSkillsRoute: typeof AuthenticatedSkillsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -197,6 +217,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCoursesRoute: AuthenticatedCoursesRoute,
+  AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSkillsRoute: AuthenticatedSkillsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,

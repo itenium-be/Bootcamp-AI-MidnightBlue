@@ -20,6 +20,7 @@ public static class SeedData
         await SeedSkillCatalogue(db);
         await app.SeedTestUsers();
         await app.SeedConsultants(db);
+        await app.SeedResources(db);
     }
 
     private static async Task SeedTeams(AppDbContext db)
@@ -743,7 +744,26 @@ public static class SeedData
             }
         }
 
-        // Learner user - basic learner role
+        // CoachNicolas — .NET team coach
+        if (await userManager.FindByNameAsync("CoachNicolas") == null)
+        {
+            var user = new ForgeUser
+            {
+                UserName = "CoachNicolas",
+                Email = "nicolas@test.local",
+                EmailConfirmed = true,
+                FirstName = "Nicolas",
+                LastName = "Coach"
+            };
+            var result = await userManager.CreateAsync(user, "Azerty123;");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "manager");
+                await userManager.AddClaimAsync(user, new Claim("team", "2")); // .NET
+            }
+        }
+
+        // Learner user — assigned to .NET team so CoachNicolas can manage them
         if (await userManager.FindByEmailAsync("learner@test.local") == null)
         {
             var user = new ForgeUser
@@ -758,6 +778,7 @@ public static class SeedData
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(user, "learner");
+                await userManager.AddClaimAsync(user, new Claim("team", "2")); // .NET team → CoachNicolas
             }
         }
 
@@ -782,11 +803,6 @@ public static class SeedData
 
     private static async Task SeedConsultants(this WebApplication app, AppDbContext db)
     {
-        if (await db.ConsultantProfiles.AnyAsync())
-        {
-            return;
-        }
-
         using var scope = app.Services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ForgeUser>>();
 
@@ -796,11 +812,12 @@ public static class SeedData
         //                  TeamId 4 (QA) → ProfileId 3, TeamId 3 (PO) → ProfileId 4
         (string Email, string First, string Last, int TeamId, int? DaysAgo, int? ProfileId)[] consultants =
         [
-            // .NET team — coach: dotnet@test.local (team 2)
-            ("lea@test.local",    "Lea",    "Van Den Berg", 2, 2,    1),  // active
-            ("thomas@test.local", "Thomas", "De Smedt",     2, 25,   1),  // inactive — no activity 25 days
-            ("amber@test.local",  "Amber",  "Jacobs",       2, 8,    1),  // active
-            ("olivier@test.local","Olivier","Maes",          2, null, 1),  // inactive — never active
+            // .NET team — coach: dotnet@test.local + CoachNicolas (team 2)
+            ("learner@test.local", "Test",    "Learner",      2, 3,    1),  // active — pre-existing user
+            ("lea@test.local",     "Lea",     "Van Den Berg", 2, 2,    1),  // active
+            ("thomas@test.local",  "Thomas",  "De Smedt",     2, 25,   1),  // inactive — no activity 25 days
+            ("amber@test.local",   "Amber",   "Jacobs",       2, 8,    1),  // active
+            ("olivier@test.local", "Olivier", "Maes",         2, null, 1),  // inactive — never active
 
             // Java team — coach: java@test.local (team 1)
             ("sander@test.local", "Sander", "Claes",        1, 1,    2),  // active
@@ -818,38 +835,114 @@ public static class SeedData
 
         foreach (var (email, first, last, teamId, daysAgo, profileId) in consultants)
         {
-            if (await userManager.FindByEmailAsync(email) != null)
+            var existingUser = await userManager.FindByEmailAsync(email);
+            if (existingUser == null)
             {
-                continue;
+                var newUser = new ForgeUser
+                {
+                    UserName = email.Split('@')[0],
+                    Email = email,
+                    EmailConfirmed = true,
+                    FirstName = first,
+                    LastName = last,
+                };
+
+                var result = await userManager.CreateAsync(newUser, "UserPassword123!");
+                if (!result.Succeeded)
+                {
+                    continue;
+                }
+
+                await userManager.AddToRoleAsync(newUser, "learner");
+                existingUser = newUser;
             }
 
-            var user = new ForgeUser
+            // Create ConsultantProfile if it doesn't exist yet
+            if (!await db.ConsultantProfiles.AnyAsync(p => p.UserId == existingUser.Id))
             {
-                UserName = email.Split('@')[0],
-                Email = email,
-                EmailConfirmed = true,
-                FirstName = first,
-                LastName = last,
-            };
-
-            var result = await userManager.CreateAsync(user, "UserPassword123!");
-            if (!result.Succeeded)
-            {
-                continue;
+                db.ConsultantProfiles.Add(new ConsultantProfileEntity
+                {
+                    UserId = existingUser.Id,
+                    TeamId = teamId,
+                    ProfileId = profileId,
+                    LastActivityAt = daysAgo.HasValue
+                        ? DateTime.UtcNow.AddDays(-daysAgo.Value)
+                        : null,
+                });
             }
-
-            await userManager.AddToRoleAsync(user, "learner");
-
-            db.ConsultantProfiles.Add(new ConsultantProfileEntity
-            {
-                UserId = user.Id,
-                TeamId = teamId,
-                ProfileId = profileId,
-                LastActivityAt = daysAgo.HasValue
-                    ? DateTime.UtcNow.AddDays(-daysAgo.Value)
-                    : null,
-            });
         }
+
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedResources(this WebApplication app, AppDbContext db)
+    {
+        if (await db.Resources.AnyAsync())
+        {
+            return;
+        }
+
+        using var scope = app.Services.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ForgeUser>>();
+
+        var backofficeUser = await userManager.FindByEmailAsync("backoffice@test.local");
+        if (backofficeUser == null)
+        {
+            return;
+        }
+
+        var userId = backofficeUser.Id;
+
+        db.Resources.AddRange(
+            new ResourceEntity
+            {
+                Title = "Clean Code by Robert C. Martin",
+                Url = "https://www.goodreads.com/book/show/3735293-clean-code",
+                Type = "book",
+                SkillId = 1, // Clean Code
+                FromLevel = 1,
+                ToLevel = 2,
+                AddedByUserId = userId,
+            },
+            new ResourceEntity
+            {
+                Title = "SOLID Principles in C# – YouTube Playlist",
+                Url = "https://www.youtube.com/results?search_query=SOLID+principles+csharp",
+                Type = "video",
+                SkillId = 2, // SOLID Principles
+                FromLevel = 1,
+                ToLevel = 3,
+                AddedByUserId = userId,
+            },
+            new ResourceEntity
+            {
+                Title = "Microsoft Docs – ASP.NET Core overview",
+                Url = "https://learn.microsoft.com/en-us/aspnet/core/introduction-to-aspnet-core",
+                Type = "article",
+                SkillId = 11, // ASP.NET Core
+                FromLevel = 1,
+                ToLevel = 2,
+                AddedByUserId = userId,
+            },
+            new ResourceEntity
+            {
+                Title = "Domain-Driven Design by Eric Evans",
+                Url = "https://www.domainlanguage.com/ddd/",
+                Type = "book",
+                SkillId = 14, // Domain-Driven Design
+                FromLevel = 2,
+                ToLevel = 3,
+                AddedByUserId = userId,
+            },
+            new ResourceEntity
+            {
+                Title = "Pro Git – free online book",
+                Url = "https://git-scm.com/book/en/v2",
+                Type = "book",
+                SkillId = 3, // Git & Version Control
+                AddedByUserId = userId,
+            }
+        );
 
         await db.SaveChangesAsync();
     }

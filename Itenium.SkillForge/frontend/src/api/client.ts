@@ -165,6 +165,56 @@ export async function fetchConsultant(userId: string): Promise<ConsultantDetail>
   return response.data;
 }
 
+export interface Resource {
+  id: number;
+  title: string;
+  url: string;
+  type: string;
+  skillId: number | null;
+  skillName: string | null;
+  fromLevel: number | null;
+  toLevel: number | null;
+  addedByUserId: string;
+  createdAt: string;
+  completedByCurrentUser: boolean;
+  currentUserRating: boolean | null;
+  thumbsUp: number;
+  thumbsDown: number;
+}
+
+export async function fetchResources(): Promise<Resource[]> {
+  const response = await api.get<Resource[]>('/api/resource');
+  return response.data;
+}
+
+export async function createResource(data: {
+  title: string;
+  url: string;
+  type: string;
+  skillId: number | null;
+  fromLevel: number | null;
+  toLevel: number | null;
+}): Promise<Resource> {
+  const response = await api.post<Resource>('/api/resource', data);
+  return response.data;
+}
+
+export async function markResourceComplete(id: number): Promise<void> {
+  await api.post(`/api/resource/${id}/complete`);
+}
+
+export async function unmarkResourceComplete(id: number): Promise<void> {
+  await api.delete(`/api/resource/${id}/complete`);
+}
+
+export async function rateResource(id: number, isPositive: boolean): Promise<void> {
+  await api.put(`/api/resource/${id}/rate`, { isPositive });
+}
+
+export async function removeResourceRating(id: number): Promise<void> {
+  await api.delete(`/api/resource/${id}/rate`);
+}
+
 export async function assignConsultantProfile(userId: string, profileId: number | null): Promise<void> {
   await api.put(`/api/consultant/${userId}/profile`, { profileId });
 }

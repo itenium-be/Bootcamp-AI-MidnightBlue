@@ -235,6 +235,7 @@ export function Layout() {
   const catalogNavItems = [
     { path: '/catalog', icon: Library, label: t('nav.catalog') },
     { path: '/skills', icon: GraduationCap, label: t('nav.skills') },
+    { path: '/resources', icon: BookOpen, label: t('nav.resources') },
   ];
 
   // Team section - shown for managers

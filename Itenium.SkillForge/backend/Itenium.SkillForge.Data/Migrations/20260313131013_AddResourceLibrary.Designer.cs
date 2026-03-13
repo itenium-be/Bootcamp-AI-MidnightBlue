@@ -3,6 +3,7 @@ using System;
 using Itenium.SkillForge.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Itenium.SkillForge.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260313131013_AddResourceLibrary")]
+    partial class AddResourceLibrary
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,37 +144,14 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.Property<DateTime?>("LastActivityAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("ProfileId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("TeamId")
                         .HasColumnType("integer");
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("ProfileId");
-
                     b.HasIndex("TeamId");
 
                     b.ToTable("ConsultantProfiles");
-                });
-
-            modelBuilder.Entity("Itenium.SkillForge.Entities.ConsultantSkillLevelEntity", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("SkillId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CurrentLevel")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "SkillId");
-
-                    b.HasIndex("SkillId");
-
-                    b.ToTable("ConsultantSkillLevels");
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.CourseEntity", b =>
@@ -757,18 +737,11 @@ namespace Itenium.SkillForge.Data.Migrations
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.ConsultantProfileEntity", b =>
                 {
-                    b.HasOne("Itenium.SkillForge.Entities.CompetenceCentreProfileEntity", "Profile")
-                        .WithMany()
-                        .HasForeignKey("ProfileId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("Itenium.SkillForge.Entities.TeamEntity", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Profile");
 
                     b.Navigation("Team");
                 });
@@ -793,17 +766,6 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.Navigation("Skill");
                 });
 
-            modelBuilder.Entity("Itenium.SkillForge.Entities.ConsultantSkillLevelEntity", b =>
-                {
-                    b.HasOne("Itenium.SkillForge.Entities.SkillEntity", "Skill")
-                        .WithMany()
-                        .HasForeignKey("SkillId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Skill");
-                });
-
             modelBuilder.Entity("Itenium.SkillForge.Entities.ResourceRatingEntity", b =>
                 {
                     b.HasOne("Itenium.SkillForge.Entities.ResourceEntity", "Resource")
@@ -814,7 +776,6 @@ namespace Itenium.SkillForge.Data.Migrations
 
                     b.Navigation("Resource");
                 });
-
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillLevelDescriptorEntity", b =>
                 {
