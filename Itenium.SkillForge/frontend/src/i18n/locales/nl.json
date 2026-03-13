@@ -25,6 +25,7 @@
     "myCertificates": "Mijn Certificaten",
     "catalogSection": "Catalogus",
     "catalog": "Cursussen Bekijken",
+    "skills": "Vaardighedencatalogus",
     "team": "Team",
     "teamMembers": "Leden",
     "teamProgress": "Voortgang",
@@ -59,6 +60,21 @@
     "totalCourses": "Totaal Cursussen",
     "activeLearners": "Actieve Leerlingen",
     "completedCourses": "Voltooide Cursussen"
+  },
+  "skills": {
+    "title": "Vaardighedencatalogus",
+    "subtitle": "Bekijk alle vaardigheden per categorie of filter op competentiecentrum profiel.",
+    "name": "Vaardigheid",
+    "description": "Beschrijving",
+    "levels": "Niveaus",
+    "noSkills": "Geen vaardigheden gevonden",
+    "filterByProfile": "Filter op profiel",
+    "allSkills": "Alle vaardigheden",
+    "checkbox": "Aanwezig/Afwezig",
+    "levels_one": "{{count}} niveau",
+    "levels_other": "{{count}} niveaus",
+    "prerequisites": "Vereisten",
+    "niveau": "niveau"
   },
   "courses": {
     "title": "Cursussen",

@@ -72,3 +72,59 @@ export async function fetchCourses(): Promise<Course[]> {
   const response = await api.get<Course[]>('/api/course');
   return response.data;
 }
+
+export interface SkillSummary {
+  id: number;
+  name: string;
+  category: string;
+  description: string | null;
+  levelCount: number;
+}
+
+export interface SkillLevelDescriptor {
+  level: number;
+  description: string;
+}
+
+export interface SkillPrerequisite {
+  requiredSkillId: number;
+  requiredSkillName: string;
+  requiredLevel: number;
+}
+
+export interface SkillDetail extends SkillSummary {
+  levelDescriptors: SkillLevelDescriptor[];
+  prerequisites: SkillPrerequisite[];
+}
+
+export interface SkillCategory {
+  category: string;
+  skills: SkillSummary[];
+}
+
+export interface CompetenceCentreProfile {
+  id: number;
+  name: string;
+  description: string | null;
+  skillCount: number;
+}
+
+export async function fetchSkillCatalogue(): Promise<SkillCategory[]> {
+  const response = await api.get<SkillCategory[]>('/api/skill/catalogue');
+  return response.data;
+}
+
+export async function fetchSkill(id: number): Promise<SkillDetail> {
+  const response = await api.get<SkillDetail>(`/api/skill/${id}`);
+  return response.data;
+}
+
+export async function fetchProfiles(): Promise<CompetenceCentreProfile[]> {
+  const response = await api.get<CompetenceCentreProfile[]>('/api/profile');
+  return response.data;
+}
+
+export async function fetchProfileSkills(profileId: number): Promise<SkillSummary[]> {
+  const response = await api.get<SkillSummary[]>(`/api/profile/${profileId}/skills`);
+  return response.data;
+}
