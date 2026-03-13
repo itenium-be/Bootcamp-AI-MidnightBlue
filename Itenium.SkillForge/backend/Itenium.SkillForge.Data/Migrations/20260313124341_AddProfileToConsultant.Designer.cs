@@ -3,6 +3,7 @@ using System;
 using Itenium.SkillForge.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Itenium.SkillForge.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260313124341_AddProfileToConsultant")]
+    partial class AddProfileToConsultant
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,24 +157,6 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("ConsultantProfiles");
-                });
-
-            modelBuilder.Entity("Itenium.SkillForge.Entities.ConsultantSkillLevelEntity", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("SkillId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CurrentLevel")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "SkillId");
-
-                    b.HasIndex("SkillId");
-
-                    b.ToTable("ConsultantSkillLevels");
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.CourseEntity", b =>
@@ -677,17 +662,6 @@ namespace Itenium.SkillForge.Data.Migrations
                     b.Navigation("Profile");
 
                     b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("Itenium.SkillForge.Entities.ConsultantSkillLevelEntity", b =>
-                {
-                    b.HasOne("Itenium.SkillForge.Entities.SkillEntity", "Skill")
-                        .WithMany()
-                        .HasForeignKey("SkillId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Skill");
                 });
 
             modelBuilder.Entity("Itenium.SkillForge.Entities.SkillLevelDescriptorEntity", b =>

@@ -72,3 +72,104 @@ export async function fetchCourses(): Promise<Course[]> {
   const response = await api.get<Course[]>('/api/course');
   return response.data;
 }
+
+export interface SkillSummary {
+  id: number;
+  name: string;
+  category: string;
+  description: string | null;
+  levelCount: number;
+}
+
+export interface SkillLevelDescriptor {
+  level: number;
+  description: string;
+}
+
+export interface SkillPrerequisite {
+  requiredSkillId: number;
+  requiredSkillName: string;
+  requiredLevel: number;
+}
+
+export interface SkillDetail extends SkillSummary {
+  levelDescriptors: SkillLevelDescriptor[];
+  prerequisites: SkillPrerequisite[];
+}
+
+export interface SkillCategory {
+  category: string;
+  skills: SkillSummary[];
+}
+
+export interface RoadmapSkill extends SkillSummary {
+  unmetPrerequisites: SkillPrerequisite[];
+}
+
+export interface RoadmapCategory {
+  category: string;
+  skills: RoadmapSkill[];
+}
+
+export interface CompetenceCentreProfile {
+  id: number;
+  name: string;
+  description: string | null;
+  skillCount: number;
+}
+
+export async function fetchSkillCatalogue(): Promise<SkillCategory[]> {
+  const response = await api.get<SkillCategory[]>('/api/skill/catalogue');
+  return response.data;
+}
+
+export async function fetchSkill(id: number): Promise<SkillDetail> {
+  const response = await api.get<SkillDetail>(`/api/skill/${id}`);
+  return response.data;
+}
+
+export async function fetchProfiles(): Promise<CompetenceCentreProfile[]> {
+  const response = await api.get<CompetenceCentreProfile[]>('/api/profile');
+  return response.data;
+}
+
+export async function fetchProfileSkills(profileId: number): Promise<SkillSummary[]> {
+  const response = await api.get<SkillSummary[]>(`/api/profile/${profileId}/skills`);
+  return response.data;
+}
+
+export interface ConsultantSummary {
+  userId: string;
+  displayName: string;
+  email: string;
+  teamId: number;
+  teamName: string;
+  lastActivityAt: string | null;
+  isInactive: boolean;
+  daysSinceActivity: number | null;
+}
+
+export interface ConsultantDetail extends ConsultantSummary {
+  createdAt: string;
+  profileId: number | null;
+  profileName: string | null;
+}
+
+export async function fetchConsultants(): Promise<ConsultantSummary[]> {
+  const response = await api.get<ConsultantSummary[]>('/api/consultant');
+  return response.data;
+}
+
+export async function fetchConsultant(userId: string): Promise<ConsultantDetail> {
+  const response = await api.get<ConsultantDetail>(`/api/consultant/${userId}`);
+  return response.data;
+}
+
+export async function assignConsultantProfile(userId: string, profileId: number | null): Promise<void> {
+  await api.put(`/api/consultant/${userId}/profile`, { profileId });
+}
+
+export async function fetchConsultantSkills(userId: string): Promise<RoadmapCategory[]> {
+  const response = await api.get<RoadmapCategory[]>(`/api/consultant/${userId}/skills`);
+  return response.data;
+}

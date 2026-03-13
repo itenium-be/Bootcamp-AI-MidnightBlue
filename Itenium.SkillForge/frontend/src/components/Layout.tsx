@@ -232,7 +232,10 @@ export function Layout() {
   ];
 
   // Catalog - shown for all users
-  const catalogNavItems = [{ path: '/catalog', icon: Library, label: t('nav.catalog') }];
+  const catalogNavItems = [
+    { path: '/catalog', icon: Library, label: t('nav.catalog') },
+    { path: '/skills', icon: GraduationCap, label: t('nav.skills') },
+  ];
 
   // Team section - shown for managers
   const teamNavItems = [
@@ -321,8 +324,8 @@ export function Layout() {
             </SidebarGroupContent>
           </SidebarGroup>
 
-          {/* Team - shown for managers (not learners) */}
-          {mode === 'manager' && !isLearnerOnly && (
+          {/* Team - shown for managers and backoffice */}
+          {!isLearnerOnly && (
             <SidebarGroup>
               <SidebarGroupLabel>{t('nav.team')}</SidebarGroupLabel>
               <SidebarGroupContent>
