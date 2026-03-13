@@ -105,6 +105,24 @@
     "active": "Actief",
     "user": "Gebruiker"
   },
+  "resourceLibrary": {
+    "title": "Resourcebibliotheek",
+    "allSkills": "Alle Skills",
+    "allTypes": "Alle Types",
+    "columnTitle": "Titel",
+    "columnType": "Type",
+    "columnSkill": "Skill",
+    "columnNiveau": "Niveaubereik",
+    "columnRating": "Beoordeling",
+    "noResources": "Geen resources gevonden",
+    "type": {
+      "article": "Artikel",
+      "video": "Video",
+      "book": "Boek",
+      "course": "Cursus",
+      "other": "Overige"
+    }
+  },
   "errors": {
     "sessionExpired": "Sessie verlopen!",
     "internalServerError": "Interne serverfout!"

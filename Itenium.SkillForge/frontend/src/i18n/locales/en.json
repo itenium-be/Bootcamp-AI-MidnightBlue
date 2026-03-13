@@ -105,6 +105,24 @@
     "active": "Active",
     "user": "User"
   },
+  "resourceLibrary": {
+    "title": "Resource Library",
+    "allSkills": "All Skills",
+    "allTypes": "All Types",
+    "columnTitle": "Title",
+    "columnType": "Type",
+    "columnSkill": "Skill",
+    "columnNiveau": "Niveau Range",
+    "columnRating": "Rating",
+    "noResources": "No resources found",
+    "type": {
+      "article": "Article",
+      "video": "Video",
+      "book": "Book",
+      "course": "Course",
+      "other": "Other"
+    }
+  },
   "errors": {
     "sessionExpired": "Session expired!",
     "internalServerError": "Internal Server Error!"

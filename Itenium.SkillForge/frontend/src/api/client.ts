@@ -72,3 +72,24 @@ export async function fetchCourses(): Promise<Course[]> {
   const response = await api.get<Course[]>('/api/course');
   return response.data;
 }
+
+export type ResourceType = 'Article' | 'Video' | 'Book' | 'Course' | 'Other';
+
+export interface Resource {
+  id: number;
+  title: string;
+  url: string;
+  type: ResourceType;
+  skillId: number | null;
+  fromLevel: number | null;
+  toLevel: number | null;
+  description: string | null;
+  upvotes: number;
+  downvotes: number;
+  createdAt: string;
+}
+
+export async function fetchResources(params?: { skillId?: number; type?: ResourceType }): Promise<Resource[]> {
+  const response = await api.get<Resource[]>('/api/resource', { params });
+  return response.data;
+}

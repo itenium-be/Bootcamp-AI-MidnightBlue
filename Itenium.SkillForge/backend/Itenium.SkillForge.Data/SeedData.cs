@@ -17,6 +17,7 @@ public static class SeedData
 
         await SeedTeams(db);
         await SeedCourses(db);
+        await SeedResources(db);
         await app.SeedTestUsers();
     }
 
@@ -42,6 +43,19 @@ public static class SeedData
                 new CourseEntity { Id = 2, Name = "Advanced C#", Description = "Master C# programming language", Category = "Development", Level = "Advanced" },
                 new CourseEntity { Id = 3, Name = "Cloud Architecture", Description = "Design scalable cloud solutions", Category = "Architecture", Level = "Intermediate" },
                 new CourseEntity { Id = 4, Name = "Agile Project Management", Description = "Learn agile methodologies", Category = "Management", Level = "Beginner" });
+            await db.SaveChangesAsync();
+        }
+    }
+
+    private static async Task SeedResources(AppDbContext db)
+    {
+        if (!await db.Resources.AnyAsync())
+        {
+            db.Resources.AddRange(
+                new ResourceEntity { Id = 1, Title = "C# in Depth", Url = "https://csharpindepth.com", Type = ResourceType.Book, SkillId = 2, FromLevel = 2, ToLevel = 4, Description = "Comprehensive guide to C# programming" },
+                new ResourceEntity { Id = 2, Title = "Introduction to C#", Url = "https://learn.microsoft.com/dotnet/csharp", Type = ResourceType.Article, SkillId = 1, FromLevel = 1, ToLevel = 2, Description = "Official Microsoft C# introduction" },
+                new ResourceEntity { Id = 3, Title = "Cloud Architecture Patterns", Url = "https://example.com/cloud-patterns", Type = ResourceType.Video, SkillId = 3, FromLevel = 2, ToLevel = 5, Description = "Video series on cloud architecture patterns" },
+                new ResourceEntity { Id = 4, Title = "Agile & Scrum Fundamentals", Url = "https://example.com/agile-course", Type = ResourceType.Course, SkillId = 4, FromLevel = 1, ToLevel = 3, Description = "Online course covering agile and scrum basics" });
             await db.SaveChangesAsync();
         }
     }
