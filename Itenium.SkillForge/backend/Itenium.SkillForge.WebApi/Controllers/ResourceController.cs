@@ -111,6 +111,24 @@ public class ResourceController : ControllerBase
     }
 
     /// <summary>
+    /// Remove the current user's completion record for a resource.
+    /// </summary>
+    [HttpDelete("{id:int}/complete")]
+    public async Task<IActionResult> RemoveCompletion(int id)
+    {
+        var consultantId = User.Identity?.Name;
+        var existing = await _db.ResourceCompletions
+            .FirstOrDefaultAsync(c => c.ConsultantId == consultantId && c.ResourceId == id);
+
+        if (existing == null)
+            return NotFound();
+
+        _db.ResourceCompletions.Remove(existing);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
+    /// <summary>
     /// Get the current user's ratings (resourceId + isUpvote) for all rated resources.
     /// </summary>
     [HttpGet("my-ratings")]
@@ -167,5 +185,30 @@ public class ResourceController : ControllerBase
 
         await _db.SaveChangesAsync();
         return Ok(existing);
+    }
+
+    /// <summary>
+    /// Remove the current user's rating for a resource.
+    /// </summary>
+    [HttpDelete("{id:int}/rate")]
+    public async Task<IActionResult> RemoveRating(int id)
+    {
+        var consultantId = User.Identity?.Name;
+        var existing = await _db.ResourceRatings
+            .FirstOrDefaultAsync(r => r.ConsultantId == consultantId && r.ResourceId == id);
+
+        if (existing == null)
+            return NotFound();
+
+        var resource = await _db.Resources.FindAsync(id);
+        if (resource != null)
+        {
+            if (existing.IsUpvote) resource.Upvotes--;
+            else resource.Downvotes--;
+        }
+
+        _db.ResourceRatings.Remove(existing);
+        await _db.SaveChangesAsync();
+        return NoContent();
     }
 }

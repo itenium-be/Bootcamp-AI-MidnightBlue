@@ -108,4 +108,26 @@ public class ResourceCompletionControllerTests : DatabaseTestBase
         var ids = okResult!.Value as List<int>;
         Assert.That(ids, Has.Count.EqualTo(1));
     }
+
+    [Test]
+    public async Task RemoveCompletion_DeletesCompletionRecord()
+    {
+        var resource = await AddResource();
+        await _sut.MarkCompleted(resource.Id);
+
+        var result = await _sut.RemoveCompletion(resource.Id);
+
+        Assert.That(result, Is.TypeOf<NoContentResult>());
+        Assert.That(Db.ResourceCompletions.Any(c => c.ConsultantId == "testuser" && c.ResourceId == resource.Id), Is.False);
+    }
+
+    [Test]
+    public async Task RemoveCompletion_WhenNotCompleted_ReturnsNotFound()
+    {
+        var resource = await AddResource();
+
+        var result = await _sut.RemoveCompletion(resource.Id);
+
+        Assert.That(result, Is.TypeOf<NotFoundResult>());
+    }
 }

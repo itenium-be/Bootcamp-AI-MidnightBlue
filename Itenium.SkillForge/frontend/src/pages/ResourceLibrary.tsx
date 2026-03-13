@@ -26,8 +26,10 @@ import {
   contributeResource,
   fetchMyCompletions,
   markResourceCompleted,
+  removeCompletion,
   fetchMyRatings,
   rateResource,
+  removeRating,
   type ContributeResourceRequest,
   type Resource,
   type ResourceRating,
@@ -93,6 +95,13 @@ export function ResourceLibrary() {
     },
   });
 
+  const uncompleteMutation = useMutation({
+    mutationFn: removeCompletion,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resource-completions'] });
+    },
+  });
+
   const { data: myRatings = [] } = useQuery<ResourceRating[]>({
     queryKey: ['resource-ratings'],
     queryFn: fetchMyRatings,
@@ -103,6 +112,14 @@ export function ResourceLibrary() {
   const rateMutation = useMutation({
     mutationFn: ({ resourceId, isUpvote }: { resourceId: number; isUpvote: boolean }) =>
       rateResource(resourceId, isUpvote),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resources'] });
+      queryClient.invalidateQueries({ queryKey: ['resource-ratings'] });
+    },
+  });
+
+  const removeRatingMutation = useMutation({
+    mutationFn: removeRating,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resources'] });
       queryClient.invalidateQueries({ queryKey: ['resource-ratings'] });
@@ -363,8 +380,12 @@ export function ResourceLibrary() {
                     <Button
                       variant={myRatingsMap.get(resource.id) === true ? 'default' : 'outline'}
                       size="sm"
-                      disabled={rateMutation.isPending}
-                      onClick={() => rateMutation.mutate({ resourceId: resource.id, isUpvote: true })}
+                      disabled={rateMutation.isPending || removeRatingMutation.isPending}
+                      onClick={() =>
+                        myRatingsMap.get(resource.id) === true
+                          ? removeRatingMutation.mutate(resource.id)
+                          : rateMutation.mutate({ resourceId: resource.id, isUpvote: true })
+                      }
                       aria-label={t('resourceLibrary.rateUp')}
                     >
                       <ThumbsUp className="size-3 mr-1" />
@@ -373,8 +394,12 @@ export function ResourceLibrary() {
                     <Button
                       variant={myRatingsMap.get(resource.id) === false ? 'default' : 'outline'}
                       size="sm"
-                      disabled={rateMutation.isPending}
-                      onClick={() => rateMutation.mutate({ resourceId: resource.id, isUpvote: false })}
+                      disabled={rateMutation.isPending || removeRatingMutation.isPending}
+                      onClick={() =>
+                        myRatingsMap.get(resource.id) === false
+                          ? removeRatingMutation.mutate(resource.id)
+                          : rateMutation.mutate({ resourceId: resource.id, isUpvote: false })
+                      }
                       aria-label={t('resourceLibrary.rateDown')}
                     >
                       <ThumbsDown className="size-3 mr-1" />
@@ -384,10 +409,16 @@ export function ResourceLibrary() {
                 </td>
                 <td className="p-3">
                   {completedIds.includes(resource.id) ? (
-                    <span className="flex items-center gap-1 text-sm text-green-600">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      disabled={uncompleteMutation.isPending}
+                      onClick={() => uncompleteMutation.mutate(resource.id)}
+                      className="text-green-600 gap-1"
+                    >
                       <CheckCircle2 className="size-4" />
                       {t('resourceLibrary.completed')}
-                    </span>
+                    </Button>
                   ) : (
                     <Button
                       variant="outline"

@@ -133,4 +133,28 @@ public class ResourceRatingControllerTests : DatabaseTestBase
         Assert.That(ratings, Has.Count.EqualTo(1));
         Assert.That(ratings![0].IsUpvote, Is.False);
     }
+
+    [Test]
+    public async Task RemoveRating_DeletesRatingAndDecrementsCounter()
+    {
+        var resource = await AddResource();
+        await _sut.RateResource(resource.Id, new RateResourceRequest(true));
+
+        var result = await _sut.RemoveRating(resource.Id);
+
+        Assert.That(result, Is.TypeOf<NoContentResult>());
+        Assert.That(Db.ResourceRatings.Any(r => r.ConsultantId == "testuser" && r.ResourceId == resource.Id), Is.False);
+        await Db.Entry(resource).ReloadAsync();
+        Assert.That(resource.Upvotes, Is.EqualTo(0));
+    }
+
+    [Test]
+    public async Task RemoveRating_WhenNotRated_ReturnsNotFound()
+    {
+        var resource = await AddResource();
+
+        var result = await _sut.RemoveRating(resource.Id);
+
+        Assert.That(result, Is.TypeOf<NotFoundResult>());
+    }
 }

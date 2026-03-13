@@ -118,6 +118,10 @@ export async function markResourceCompleted(resourceId: number): Promise<void> {
   await api.post(`/api/resource/${resourceId}/complete`);
 }
 
+export async function removeCompletion(resourceId: number): Promise<void> {
+  await api.delete(`/api/resource/${resourceId}/complete`);
+}
+
 export interface ResourceRating {
   resourceId: number;
   isUpvote: boolean;
@@ -130,4 +134,8 @@ export async function fetchMyRatings(): Promise<ResourceRating[]> {
 
 export async function rateResource(resourceId: number, isUpvote: boolean): Promise<void> {
   await api.post(`/api/resource/${resourceId}/rate`, { isUpvote });
+}
+
+export async function removeRating(resourceId: number): Promise<void> {
+  await api.delete(`/api/resource/${resourceId}/rate`);
 }
