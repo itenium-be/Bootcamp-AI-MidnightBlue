@@ -18,6 +18,7 @@ public static class SeedData
         await SeedTeams(db);
         await SeedCourses(db);
         await SeedResources(db);
+        await SeedGoals(db);
         await app.SeedTestUsers();
     }
 
@@ -56,6 +57,18 @@ public static class SeedData
                 new ResourceEntity { Id = 2, Title = "Introduction to C#", Url = "https://learn.microsoft.com/dotnet/csharp", Type = ResourceType.Article, SkillId = 1, FromLevel = 1, ToLevel = 2, Description = "Official Microsoft C# introduction" },
                 new ResourceEntity { Id = 3, Title = "Cloud Architecture Patterns", Url = "https://example.com/cloud-patterns", Type = ResourceType.Video, SkillId = 3, FromLevel = 2, ToLevel = 5, Description = "Video series on cloud architecture patterns" },
                 new ResourceEntity { Id = 4, Title = "Agile & Scrum Fundamentals", Url = "https://example.com/agile-course", Type = ResourceType.Course, SkillId = 4, FromLevel = 1, ToLevel = 3, Description = "Online course covering agile and scrum basics" });
+            await db.SaveChangesAsync();
+        }
+    }
+
+    private static async Task SeedGoals(AppDbContext db)
+    {
+        if (!await db.Goals.AnyAsync())
+        {
+            db.Goals.AddRange(
+                new GoalEntity { Id = 1, ConsultantId = "learner", Title = "Clean Code niveau 3", SkillId = 1, TargetLevel = 3, Deadline = new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc), Notes = "Focus on naming, functions, and code structure.", CreatedBy = "dotnet" },
+                new GoalEntity { Id = 2, ConsultantId = "learner", Title = "Entity Framework niveau 2", SkillId = 2, TargetLevel = 2, Deadline = new DateTime(2026, 5, 1, 0, 0, 0, DateTimeKind.Utc), Notes = "Master EF Core querying and migrations.", CreatedBy = "dotnet" },
+                new GoalEntity { Id = 3, ConsultantId = "learner", Title = "REST API Design niveau 2", SkillId = 3, TargetLevel = 2, Deadline = new DateTime(2026, 7, 1, 0, 0, 0, DateTimeKind.Utc), Notes = "Apply REST principles in current mission.", CreatedBy = "dotnet" });
             await db.SaveChangesAsync();
         }
     }

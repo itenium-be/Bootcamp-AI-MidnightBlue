@@ -21,6 +21,10 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<ResourceRatingEntity> ResourceRatings => Set<ResourceRatingEntity>();
 
+    public DbSet<GoalEntity> Goals => Set<GoalEntity>();
+
+    public DbSet<ReadinessFlagEntity> ReadinessFlags => Set<ReadinessFlagEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -31,6 +35,10 @@ public class AppDbContext : ForgeIdentityDbContext
 
         builder.Entity<ResourceRatingEntity>()
             .HasIndex(r => new { r.ConsultantId, r.ResourceId })
+            .IsUnique();
+
+        builder.Entity<ReadinessFlagEntity>()
+            .HasIndex(f => f.GoalId)
             .IsUnique();
     }
 }

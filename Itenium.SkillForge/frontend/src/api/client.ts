@@ -135,3 +135,36 @@ export async function rateResource(resourceId: number, isUpvote: boolean): Promi
 export async function removeRating(resourceId: number): Promise<void> {
   await api.delete(`/api/resource/${resourceId}/rate`);
 }
+
+export interface Goal {
+  id: number;
+  title: string;
+  skillId: number | null;
+  targetLevel: number | null;
+  deadline: string | null;
+  notes: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  flagRaisedAt: string | null;
+}
+
+export interface TeamFlag {
+  goalId: number;
+  goalTitle: string;
+  consultantId: string;
+  raisedAt: string;
+}
+
+export async function fetchMyGoals(): Promise<Goal[]> {
+  const response = await api.get<Goal[]>('/api/goal');
+  return response.data;
+}
+
+export async function raiseReadinessFlag(goalId: number): Promise<void> {
+  await api.post(`/api/goal/${goalId}/ready`);
+}
+
+export async function fetchTeamFlags(): Promise<TeamFlag[]> {
+  const response = await api.get<TeamFlag[]>('/api/goal/flags');
+  return response.data;
+}

@@ -23,6 +23,7 @@
     "myCourses": "My Courses",
     "myProgress": "My Progress",
     "myCertificates": "My Certificates",
+    "myGoals": "My Goals",
     "catalogSection": "Catalog",
     "catalog": "Browse Courses",
     "team": "Team",
@@ -58,7 +59,13 @@
     "welcome": "Welcome to Itenium SkillForge",
     "totalCourses": "Total Courses",
     "activeLearners": "Active Learners",
-    "completedCourses": "Completed Courses"
+    "completedCourses": "Completed Courses",
+    "readinessFlags": "Readiness Flags",
+    "noFlags": "No readiness flags raised.",
+    "flagConsultant": "Consultant",
+    "flagGoal": "Goal",
+    "flagAge": "Age",
+    "daysAgo": "{{days}} day(s) ago"
   },
   "courses": {
     "title": "Courses",
@@ -149,6 +156,15 @@
       "course": "Course",
       "other": "Other"
     }
+  },
+  "goals": {
+    "title": "My Goals",
+    "noGoals": "No goals assigned yet.",
+    "targetLevel": "Target level",
+    "deadline": "Deadline",
+    "setBy": "Set by",
+    "raiseFlag": "I'm ready!",
+    "flagRaised": "Flagged {{days}} day(s) ago"
   },
   "errors": {
     "sessionExpired": "Session expired!",

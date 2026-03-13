@@ -49,6 +49,7 @@ import {
   ClipboardList,
   MessageSquare,
   CheckCircle,
+  Flag,
 } from 'lucide-react';
 import { useAuthStore, useTeamStore, useThemeStore, type Team } from '@/stores';
 import { fetchUserTeams } from '@/api/client';
@@ -226,6 +227,7 @@ export function Layout() {
 
   // My Learning section - shown for learners and managers
   const myLearningNavItems = [
+    { path: '/goals', icon: Flag, label: t('nav.myGoals') },
     { path: '/my-courses', icon: BookOpen, label: t('nav.myCourses') },
     { path: '/my-progress', icon: TrendingUp, label: t('nav.myProgress') },
     { path: '/my-certificates', icon: Award, label: t('nav.myCertificates') },
