@@ -33,7 +33,8 @@ public record RoadmapSkillDto(
     string Category,
     string? Description,
     int LevelCount,
-    IReadOnlyList<SkillPrerequisiteDto> UnmetPrerequisites
+    IReadOnlyList<SkillPrerequisiteDto> UnmetPrerequisites,
+    bool IsInDefaultView
 );
 
 public record RoadmapCategoryDto(

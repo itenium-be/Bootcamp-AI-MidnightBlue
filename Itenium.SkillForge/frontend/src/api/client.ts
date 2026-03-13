@@ -104,6 +104,7 @@ export interface SkillCategory {
 
 export interface RoadmapSkill extends SkillSummary {
   unmetPrerequisites: SkillPrerequisite[];
+  isInDefaultView: boolean;
 }
 
 export interface RoadmapCategory {

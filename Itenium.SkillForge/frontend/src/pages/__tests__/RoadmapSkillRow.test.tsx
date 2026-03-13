@@ -32,6 +32,7 @@ const baseSkill: RoadmapSkill = {
   description: null,
   levelCount: 3,
   unmetPrerequisites: [],
+  isInDefaultView: true,
 };
 
 describe('RoadmapSkillRow', () => {

@@ -153,7 +153,9 @@
     "profileSaved": "Profiel opgeslagen",
     "skillRoadmap": "Vaardigheden Roadmap",
     "noRoadmap": "Wijs een competentiecentrum profiel toe om de vaardigheden roadmap te zien.",
-    "prerequisiteWarning": "Vereisten nog niet behaald"
+    "prerequisiteWarning": "Vereisten nog niet behaald",
+    "showAll": "Toon alles ({{count}})",
+    "showLess": "Toon minder"
   },
   "resources": {
     "title": "Bronnenbibliotheek",
