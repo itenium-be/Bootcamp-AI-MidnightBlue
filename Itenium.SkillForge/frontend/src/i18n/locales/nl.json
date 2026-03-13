@@ -37,7 +37,8 @@
     "completion": "Voltooiing",
     "feedback": "Feedback",
     "settingsSection": "Instellingen",
-    "certificateTemplates": "Certificaat Sjablonen"
+    "certificateTemplates": "Certificaat Sjablonen",
+    "resources": "Bronnenbibliotheek"
   },
   "auth": {
     "signIn": "Inloggen",
@@ -145,6 +146,27 @@
     "active": "Actief",
     "inactive": "Inactief",
     "neverActive": "Nooit actief"
+  },
+  "resources": {
+    "title": "Bronnenbibliotheek",
+    "subtitle": "Bekijk, voeg toe en beoordeel leermateriaal.",
+    "addResource": "Bron Toevoegen",
+    "cancel": "Annuleren",
+    "title_field": "Titel",
+    "url": "URL",
+    "type": "Type",
+    "skill": "Vaardigheid",
+    "noSkill": "Geen vaardigheid",
+    "fromLevel": "Vanaf niveau",
+    "toLevel": "Tot niveau",
+    "completed": "Voltooid",
+    "article": "Artikel",
+    "video": "Video",
+    "book": "Boek",
+    "course": "Cursus",
+    "podcast": "Podcast",
+    "other": "Overig",
+    "noResources": "Nog geen bronnen. Wees de eerste om er een toe te voegen!"
   },
   "errors": {
     "sessionExpired": "Sessie verlopen!",

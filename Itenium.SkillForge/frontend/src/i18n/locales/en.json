@@ -37,7 +37,8 @@
     "completion": "Completion",
     "feedback": "Feedback",
     "settingsSection": "Settings",
-    "certificateTemplates": "Certificate Templates"
+    "certificateTemplates": "Certificate Templates",
+    "resources": "Resource Library"
   },
   "auth": {
     "signIn": "Sign In",
@@ -145,6 +146,27 @@
     "active": "Active",
     "inactive": "Inactive",
     "neverActive": "Never active"
+  },
+  "resources": {
+    "title": "Resource Library",
+    "subtitle": "Browse, add and rate learning resources.",
+    "addResource": "Add Resource",
+    "cancel": "Cancel",
+    "title_field": "Title",
+    "url": "URL",
+    "type": "Type",
+    "skill": "Skill",
+    "noSkill": "No skill",
+    "fromLevel": "From level",
+    "toLevel": "To level",
+    "completed": "Completed",
+    "article": "Article",
+    "video": "Video",
+    "book": "Book",
+    "course": "Course",
+    "podcast": "Podcast",
+    "other": "Other",
+    "noResources": "No resources yet. Be the first to add one!"
   },
   "errors": {
     "sessionExpired": "Session expired!",

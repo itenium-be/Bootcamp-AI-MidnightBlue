@@ -12,7 +12,11 @@ interface ConsultantProfileProps {
 export function ConsultantProfile({ userId }: ConsultantProfileProps) {
   const { t } = useTranslation();
 
-  const { data: consultant, isLoading, isError } = useQuery({
+  const {
+    data: consultant,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ['consultant', userId],
     queryFn: () => fetchConsultant(userId),
   });

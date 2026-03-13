@@ -27,6 +27,10 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<ConsultantProfileEntity> ConsultantProfiles => Set<ConsultantProfileEntity>();
 
+    public DbSet<ResourceEntity> Resources => Set<ResourceEntity>();
+    public DbSet<ResourceCompletionEntity> ResourceCompletions => Set<ResourceCompletionEntity>();
+    public DbSet<ResourceRatingEntity> ResourceRatings => Set<ResourceRatingEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -57,6 +61,16 @@ public class AppDbContext : ForgeIdentityDbContext
             e.HasOne(x => x.Skill)
                 .WithMany(x => x.ProfileSkills)
                 .HasForeignKey(x => x.SkillId);
+        });
+
+        builder.Entity<ResourceRatingEntity>(e =>
+        {
+            e.HasKey(x => new { x.ResourceId, x.UserId });
+        });
+
+        builder.Entity<ResourceCompletionEntity>(e =>
+        {
+            e.HasIndex(x => new { x.ResourceId, x.UserId }).IsUnique();
         });
     }
 }
