@@ -1,14 +1,61 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
-import { fetchResources, fetchCourses, type ResourceType } from '@/api/client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Plus, Loader2 } from 'lucide-react';
+import {
+  Button,
+  Input,
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from '@itenium-forge/ui';
+import {
+  fetchResources,
+  fetchCourses,
+  contributeResource,
+  type ContributeResourceRequest,
+  type Resource,
+  type ResourceType,
+} from '@/api/client';
 
 const RESOURCE_TYPES: ResourceType[] = ['Article', 'Video', 'Book', 'Course', 'Other'];
 
+const createFormSchema = (t: (key: string) => string) =>
+  z.object({
+    title: z.string().min(1, t('resourceLibrary.form.titleRequired')).max(200),
+    url: z.string().min(1, t('resourceLibrary.form.urlRequired')).url(t('resourceLibrary.form.urlInvalid')),
+    type: z.string().min(1, t('resourceLibrary.form.typeRequired')),
+    skillId: z.string().min(1, t('resourceLibrary.form.skillRequired')),
+    fromLevel: z.string().optional(),
+    toLevel: z.string().optional(),
+    description: z.string().max(2000).optional(),
+  });
+
+type FormData = z.infer<ReturnType<typeof createFormSchema>>;
+
 export function ResourceLibrary() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
   const [skillFilter, setSkillFilter] = useState<number | undefined>();
   const [typeFilter, setTypeFilter] = useState<ResourceType | undefined>();
+
+  const formSchema = createFormSchema(t);
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { title: '', url: '', description: '', fromLevel: undefined, toLevel: undefined },
+  });
 
   const { data: resources, isLoading } = useQuery({
     queryKey: ['resources', skillFilter, typeFilter],
@@ -20,15 +67,198 @@ export function ResourceLibrary() {
     queryFn: fetchCourses,
   });
 
+  const mutation = useMutation({
+    mutationFn: contributeResource,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resources'] });
+      form.reset();
+      setShowForm(false);
+    },
+  });
+
+  const onSubmit = (data: FormData) => {
+    const request: ContributeResourceRequest = {
+      title: data.title,
+      url: data.url,
+      type: data.type as ResourceType,
+      skillId: parseInt(data.skillId),
+      fromLevel: data.fromLevel ? parseInt(data.fromLevel) : null,
+      toLevel: data.toLevel ? parseInt(data.toLevel) : null,
+      description: data.description || null,
+    };
+    mutation.mutate(request);
+  };
+
   if (isLoading) {
     return <div>{t('common.loading')}</div>;
   }
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">{t('resourceLibrary.title')}</h1>
+        <Button onClick={() => setShowForm((v) => !v)} variant={showForm ? 'outline' : 'default'}>
+          <Plus className="size-4 mr-2" />
+          {t('resourceLibrary.contribute')}
+        </Button>
       </div>
+
+      {showForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('resourceLibrary.form.title')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form id="contribute-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('resourceLibrary.form.titleLabel')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('resourceLibrary.form.titlePlaceholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('resourceLibrary.form.urlLabel')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('resourceLibrary.form.typeLabel')}</FormLabel>
+                        <FormControl>
+                          <select className="w-full rounded-md border px-3 py-2 text-sm bg-background" {...field}>
+                            <option value="">{t('resourceLibrary.form.typePlaceholder')}</option>
+                            {RESOURCE_TYPES.map((type) => (
+                              <option key={type} value={type}>
+                                {t(`resourceLibrary.type.${type.toLowerCase()}`)}
+                              </option>
+                            ))}
+                          </select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="skillId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('resourceLibrary.form.skillLabel')}</FormLabel>
+                        <FormControl>
+                          <select className="w-full rounded-md border px-3 py-2 text-sm bg-background" {...field}>
+                            <option value="">{t('resourceLibrary.form.skillPlaceholder')}</option>
+                            {skills?.map((s) => (
+                              <option key={s.id} value={s.id}>
+                                {s.name}
+                              </option>
+                            ))}
+                          </select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="fromLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('resourceLibrary.form.fromLevelLabel')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={1}
+                            placeholder={t('resourceLibrary.form.levelPlaceholder')}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="toLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('resourceLibrary.form.toLevelLabel')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={1}
+                            placeholder={t('resourceLibrary.form.levelPlaceholder')}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('resourceLibrary.form.descriptionLabel')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('resourceLibrary.form.descriptionPlaceholder')}
+                          {...field}
+                          value={field.value ?? ''}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowForm(false);
+                form.reset();
+              }}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" form="contribute-form" disabled={mutation.isPending}>
+              {mutation.isPending ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
+              {t('resourceLibrary.form.submit')}
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
 
       <div className="flex gap-4">
         <select
@@ -70,7 +300,7 @@ export function ResourceLibrary() {
             </tr>
           </thead>
           <tbody>
-            {resources?.map((resource) => (
+            {resources?.map((resource: Resource) => (
               <tr key={resource.id} className="border-b">
                 <td className="p-3">
                   <a

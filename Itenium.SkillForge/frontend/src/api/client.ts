@@ -93,3 +93,18 @@ export async function fetchResources(params?: { skillId?: number; type?: Resourc
   const response = await api.get<Resource[]>('/api/resource', { params });
   return response.data;
 }
+
+export interface ContributeResourceRequest {
+  title: string;
+  url: string;
+  type: ResourceType;
+  skillId: number;
+  fromLevel?: number | null;
+  toLevel?: number | null;
+  description?: string | null;
+}
+
+export async function contributeResource(request: ContributeResourceRequest): Promise<Resource> {
+  const response = await api.post<Resource>('/api/resource', request);
+  return response.data;
+}

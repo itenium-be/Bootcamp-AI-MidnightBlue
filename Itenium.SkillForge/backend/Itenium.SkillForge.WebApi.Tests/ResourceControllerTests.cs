@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using Itenium.SkillForge.Entities;
 using Itenium.SkillForge.WebApi.Controllers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Itenium.SkillForge.WebApi.Tests;
@@ -13,6 +15,14 @@ public class ResourceControllerTests : DatabaseTestBase
     public void Setup()
     {
         _sut = new ResourceController(Db);
+        _sut.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext
+            {
+                User = new ClaimsPrincipal(new ClaimsIdentity(
+                    [new Claim(ClaimTypes.Name, "testuser")], "test")),
+            },
+        };
     }
 
     [Test]
@@ -91,5 +101,54 @@ public class ResourceControllerTests : DatabaseTestBase
         var resources = okResult!.Value as List<ResourceEntity>;
         Assert.That(resources, Has.Count.EqualTo(1));
         Assert.That(resources![0].Title, Is.EqualTo("Match"));
+    }
+
+    [Test]
+    public async Task ContributeResource_SavesResourceWithContributorAndReturnsCreated()
+    {
+        var request = new ContributeResourceRequest(
+            Title: "Clean Code",
+            Url: "https://example.com/clean-code",
+            Type: ResourceType.Book,
+            SkillId: 1,
+            FromLevel: 2,
+            ToLevel: 4,
+            Description: "A great book");
+
+        var result = await _sut.ContributeResource(request);
+
+        var createdResult = result.Result as CreatedAtActionResult;
+        Assert.That(createdResult, Is.Not.Null);
+        var resource = createdResult!.Value as ResourceEntity;
+        Assert.That(resource!.Title, Is.EqualTo("Clean Code"));
+        Assert.That(resource.Url, Is.EqualTo("https://example.com/clean-code"));
+        Assert.That(resource.Type, Is.EqualTo(ResourceType.Book));
+        Assert.That(resource.SkillId, Is.EqualTo(1));
+        Assert.That(resource.FromLevel, Is.EqualTo(2));
+        Assert.That(resource.ToLevel, Is.EqualTo(4));
+        Assert.That(resource.Description, Is.EqualTo("A great book"));
+        Assert.That(resource.ContributedBy, Is.EqualTo("testuser"));
+        Assert.That(resource.ContributedAt, Is.Not.Null);
+    }
+
+    [Test]
+    public async Task ContributeResource_ImmediatelyVisibleInGetResources()
+    {
+        var request = new ContributeResourceRequest(
+            Title: "New Resource",
+            Url: "https://example.com/new",
+            Type: ResourceType.Article,
+            SkillId: 2,
+            FromLevel: null,
+            ToLevel: null,
+            Description: null);
+
+        await _sut.ContributeResource(request);
+        var getResult = await _sut.GetResources(null, null);
+
+        var okResult = getResult.Result as OkObjectResult;
+        var resources = okResult!.Value as List<ResourceEntity>;
+        Assert.That(resources, Has.Count.EqualTo(1));
+        Assert.That(resources![0].Title, Is.EqualTo("New Resource"));
     }
 }

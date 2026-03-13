@@ -38,4 +38,30 @@ public class ResourceController : ControllerBase
         var resources = await query.OrderBy(r => r.Title).ToListAsync();
         return Ok(resources);
     }
+
+    /// <summary>
+    /// Contribute a new resource to the library.
+    /// Accessible by all authenticated users (learner, manager, backoffice).
+    /// </summary>
+    [HttpPost]
+    public async Task<ActionResult<ResourceEntity>> ContributeResource([FromBody] ContributeResourceRequest request)
+    {
+        var resource = new ResourceEntity
+        {
+            Title = request.Title,
+            Url = request.Url,
+            Type = request.Type,
+            SkillId = request.SkillId,
+            FromLevel = request.FromLevel,
+            ToLevel = request.ToLevel,
+            Description = request.Description,
+            ContributedBy = User.Identity?.Name,
+            ContributedAt = DateTime.UtcNow,
+        };
+
+        _db.Resources.Add(resource);
+        await _db.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetResources), new { id = resource.Id }, resource);
+    }
 }

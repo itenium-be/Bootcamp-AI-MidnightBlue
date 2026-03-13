@@ -38,6 +38,13 @@ public class ResourceEntity
     /// <summary>Downvote count — updated by SF-17 (Rate a resource).</summary>
     public int Downvotes { get; set; }
 
+    /// <summary>Username of the contributor (SF-15).</summary>
+    [MaxLength(200)]
+    public string? ContributedBy { get; set; }
+
+    /// <summary>Timestamp of contribution (SF-15). Null for seeded resources.</summary>
+    public DateTime? ContributedAt { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public override string ToString() => $"{Title} ({Type})";
