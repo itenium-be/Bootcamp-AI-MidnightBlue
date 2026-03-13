@@ -26,7 +26,6 @@ import {
   contributeResource,
   fetchMyCompletions,
   markResourceCompleted,
-  removeCompletion,
   fetchMyRatings,
   rateResource,
   removeRating,
@@ -90,13 +89,6 @@ export function ResourceLibrary() {
 
   const completeMutation = useMutation({
     mutationFn: markResourceCompleted,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['resource-completions'] });
-    },
-  });
-
-  const uncompleteMutation = useMutation({
-    mutationFn: removeCompletion,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resource-completions'] });
     },
@@ -409,16 +401,10 @@ export function ResourceLibrary() {
                 </td>
                 <td className="p-3">
                   {completedIds.includes(resource.id) ? (
-                    <Button
-                      variant="default"
-                      size="sm"
-                      disabled={uncompleteMutation.isPending}
-                      onClick={() => uncompleteMutation.mutate(resource.id)}
-                      className="text-green-600 gap-1"
-                    >
+                    <span className="flex items-center gap-1 text-sm text-green-600">
                       <CheckCircle2 className="size-4" />
                       {t('resourceLibrary.completed')}
-                    </Button>
+                    </span>
                   ) : (
                     <Button
                       variant="outline"

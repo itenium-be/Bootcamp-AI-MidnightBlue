@@ -118,10 +118,6 @@ export async function markResourceCompleted(resourceId: number): Promise<void> {
   await api.post(`/api/resource/${resourceId}/complete`);
 }
 
-export async function removeCompletion(resourceId: number): Promise<void> {
-  await api.delete(`/api/resource/${resourceId}/complete`);
-}
-
 export interface ResourceRating {
   resourceId: number;
   isUpvote: boolean;

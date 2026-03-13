@@ -111,24 +111,6 @@ public class ResourceController : ControllerBase
     }
 
     /// <summary>
-    /// Remove the current user's completion record for a resource.
-    /// </summary>
-    [HttpDelete("{id:int}/complete")]
-    public async Task<IActionResult> RemoveCompletion(int id)
-    {
-        var consultantId = User.Identity?.Name;
-        var existing = await _db.ResourceCompletions
-            .FirstOrDefaultAsync(c => c.ConsultantId == consultantId && c.ResourceId == id);
-
-        if (existing == null)
-            return NotFound();
-
-        _db.ResourceCompletions.Remove(existing);
-        await _db.SaveChangesAsync();
-        return NoContent();
-    }
-
-    /// <summary>
     /// Get the current user's ratings (resourceId + isUpvote) for all rated resources.
     /// </summary>
     [HttpGet("my-ratings")]
