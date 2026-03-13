@@ -117,3 +117,17 @@ export async function fetchMyCompletions(): Promise<number[]> {
 export async function markResourceCompleted(resourceId: number): Promise<void> {
   await api.post(`/api/resource/${resourceId}/complete`);
 }
+
+export interface ResourceRating {
+  resourceId: number;
+  isUpvote: boolean;
+}
+
+export async function fetchMyRatings(): Promise<ResourceRating[]> {
+  const response = await api.get<ResourceRating[]>('/api/resource/my-ratings');
+  return response.data;
+}
+
+export async function rateResource(resourceId: number, isUpvote: boolean): Promise<void> {
+  await api.post(`/api/resource/${resourceId}/rate`, { isUpvote });
+}

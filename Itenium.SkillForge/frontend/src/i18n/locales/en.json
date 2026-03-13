@@ -119,6 +119,8 @@
     "markCompleted": "Mark as completed",
     "completed": "Completed",
     "contribute": "Contribute Resource",
+    "rateUp": "Upvote",
+    "rateDown": "Downvote",
     "form": {
       "title": "Contribute a Resource",
       "titleLabel": "Title",

@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, Loader2, CheckCircle2 } from 'lucide-react';
+import { Plus, Loader2, CheckCircle2, ThumbsUp, ThumbsDown } from 'lucide-react';
 import {
   Button,
   Input,
@@ -26,8 +26,11 @@ import {
   contributeResource,
   fetchMyCompletions,
   markResourceCompleted,
+  fetchMyRatings,
+  rateResource,
   type ContributeResourceRequest,
   type Resource,
+  type ResourceRating,
   type ResourceType,
 } from '@/api/client';
 
@@ -87,6 +90,22 @@ export function ResourceLibrary() {
     mutationFn: markResourceCompleted,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resource-completions'] });
+    },
+  });
+
+  const { data: myRatings = [] } = useQuery<ResourceRating[]>({
+    queryKey: ['resource-ratings'],
+    queryFn: fetchMyRatings,
+  });
+
+  const myRatingsMap = new Map(myRatings.map((r) => [r.resourceId, r.isUpvote]));
+
+  const rateMutation = useMutation({
+    mutationFn: ({ resourceId, isUpvote }: { resourceId: number; isUpvote: boolean }) =>
+      rateResource(resourceId, isUpvote),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resources'] });
+      queryClient.invalidateQueries({ queryKey: ['resource-ratings'] });
     },
   });
 
@@ -339,8 +358,29 @@ export function ResourceLibrary() {
                     ? `${resource.fromLevel ?? '?'} – ${resource.toLevel ?? '?'}`
                     : '-'}
                 </td>
-                <td className="p-3 text-muted-foreground">
-                  👍 {resource.upvotes} / 👎 {resource.downvotes}
+                <td className="p-3">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant={myRatingsMap.get(resource.id) === true ? 'default' : 'outline'}
+                      size="sm"
+                      disabled={rateMutation.isPending}
+                      onClick={() => rateMutation.mutate({ resourceId: resource.id, isUpvote: true })}
+                      aria-label={t('resourceLibrary.rateUp')}
+                    >
+                      <ThumbsUp className="size-3 mr-1" />
+                      {resource.upvotes}
+                    </Button>
+                    <Button
+                      variant={myRatingsMap.get(resource.id) === false ? 'default' : 'outline'}
+                      size="sm"
+                      disabled={rateMutation.isPending}
+                      onClick={() => rateMutation.mutate({ resourceId: resource.id, isUpvote: false })}
+                      aria-label={t('resourceLibrary.rateDown')}
+                    >
+                      <ThumbsDown className="size-3 mr-1" />
+                      {resource.downvotes}
+                    </Button>
+                  </div>
                 </td>
                 <td className="p-3">
                   {completedIds.includes(resource.id) ? (

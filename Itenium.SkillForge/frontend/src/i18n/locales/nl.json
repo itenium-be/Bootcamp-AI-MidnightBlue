@@ -119,6 +119,8 @@
     "markCompleted": "Markeer als voltooid",
     "completed": "Voltooid",
     "contribute": "Resource Toevoegen",
+    "rateUp": "Positief beoordelen",
+    "rateDown": "Negatief beoordelen",
     "form": {
       "title": "Resource Toevoegen",
       "titleLabel": "Titel",

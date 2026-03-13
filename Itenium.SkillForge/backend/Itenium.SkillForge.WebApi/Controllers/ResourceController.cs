@@ -109,4 +109,63 @@ public class ResourceController : ControllerBase
 
         return Ok(completion);
     }
+
+    /// <summary>
+    /// Get the current user's ratings (resourceId + isUpvote) for all rated resources.
+    /// </summary>
+    [HttpGet("my-ratings")]
+    public async Task<ActionResult<List<MyRatingDto>>> GetMyRatings()
+    {
+        var consultantId = User.Identity?.Name;
+        var ratings = await _db.ResourceRatings
+            .Where(r => r.ConsultantId == consultantId)
+            .Select(r => new MyRatingDto(r.ResourceId, r.IsUpvote))
+            .ToListAsync();
+        return Ok(ratings);
+    }
+
+    /// <summary>
+    /// Rate a resource thumbs up or down. Replaces any existing rating from this user.
+    /// Accessible by all authenticated users (learner, manager, backoffice).
+    /// </summary>
+    [HttpPost("{id:int}/rate")]
+    public async Task<ActionResult<ResourceRatingEntity>> RateResource(int id, [FromBody] RateResourceRequest request)
+    {
+        var resource = await _db.Resources.FindAsync(id);
+        if (resource == null)
+            return NotFound();
+
+        var consultantId = User.Identity?.Name;
+
+        var existing = await _db.ResourceRatings
+            .FirstOrDefaultAsync(r => r.ConsultantId == consultantId && r.ResourceId == id);
+
+        if (existing != null)
+        {
+            if (existing.IsUpvote == request.IsUpvote)
+                return Ok(existing);
+
+            if (existing.IsUpvote) { resource.Upvotes--; resource.Downvotes++; }
+            else { resource.Downvotes--; resource.Upvotes++; }
+
+            existing.IsUpvote = request.IsUpvote;
+            existing.RatedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            existing = new ResourceRatingEntity
+            {
+                ConsultantId = consultantId!,
+                ResourceId = id,
+                IsUpvote = request.IsUpvote,
+            };
+            _db.ResourceRatings.Add(existing);
+
+            if (request.IsUpvote) resource.Upvotes++;
+            else resource.Downvotes++;
+        }
+
+        await _db.SaveChangesAsync();
+        return Ok(existing);
+    }
 }
