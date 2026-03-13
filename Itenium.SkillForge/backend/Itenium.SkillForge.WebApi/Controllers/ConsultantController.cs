@@ -83,6 +83,7 @@ public class ConsultantController : ControllerBase
     {
         var profile = await _db.ConsultantProfiles
             .Include(p => p.Team)
+            .Include(p => p.Profile)
             .FirstOrDefaultAsync(p => p.UserId == userId);
 
         if (profile == null)
@@ -116,6 +117,58 @@ public class ConsultantController : ControllerBase
             profile.LastActivityAt,
             inactive,
             days,
-            profile.CreatedAt));
+            profile.CreatedAt,
+            profile.ProfileId,
+            profile.Profile?.Name));
+    }
+
+    /// <summary>
+    /// Assign or clear a competence centre profile for a consultant.
+    /// Only managers on the same team or backoffice can assign profiles.
+    /// </summary>
+    [HttpPut("{userId}/profile")]
+    [Authorize(Roles = "manager,backoffice")]
+    public async Task<IActionResult> AssignProfile(string userId, [FromBody] AssignProfileRequest request)
+    {
+        var profile = await _db.ConsultantProfiles.Include(p => p.Team).FirstOrDefaultAsync(p => p.UserId == userId);
+        if (profile == null) return NotFound();
+        if (!_user.IsBackOffice && !_user.Teams.Contains(profile.TeamId)) return NotFound();
+
+        if (request.ProfileId.HasValue)
+        {
+            var exists = await _db.CompetenceCentreProfiles.AnyAsync(p => p.Id == request.ProfileId.Value);
+            if (!exists) return BadRequest("Profile not found.");
+        }
+
+        profile.ProfileId = request.ProfileId;
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Get the skills for a consultant filtered by their assigned competence centre profile.
+    /// </summary>
+    [HttpGet("{userId}/skills")]
+    public async Task<ActionResult<IReadOnlyList<SkillCategoryDto>>> GetConsultantSkills(string userId)
+    {
+        var consultantProfile = await _db.ConsultantProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+        if (consultantProfile == null) return NotFound();
+        if (!_user.IsBackOffice && !_user.Teams.Contains(consultantProfile.TeamId)) return NotFound();
+
+        if (consultantProfile.ProfileId == null) return Ok(Array.Empty<SkillCategoryDto>());
+
+        var skills = await _db.CompetenceCentreProfileSkills
+            .Where(ps => ps.ProfileId == consultantProfile.ProfileId)
+            .Include(ps => ps.Skill)
+            .Select(ps => new SkillSummaryDto(ps.Skill.Id, ps.Skill.Name, ps.Skill.Category, ps.Skill.Description, ps.Skill.LevelCount))
+            .ToListAsync();
+
+        var categories = skills
+            .GroupBy(s => s.Category, StringComparer.Ordinal)
+            .OrderBy(g => g.Key, StringComparer.Ordinal)
+            .Select(g => new SkillCategoryDto(g.Key, g.OrderBy(s => s.Name, StringComparer.Ordinal).ToList()))
+            .ToList();
+
+        return Ok(categories);
     }
 }

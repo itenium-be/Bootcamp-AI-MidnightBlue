@@ -20,5 +20,9 @@ public record ConsultantDetailDto(
     DateTime? LastActivityAt,
     bool IsInactive,
     int? DaysSinceActivity,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    int? ProfileId,
+    string? ProfileName
 );
+
+public record AssignProfileRequest(int? ProfileId);

@@ -142,6 +142,8 @@ export interface ConsultantSummary {
 
 export interface ConsultantDetail extends ConsultantSummary {
   createdAt: string;
+  profileId: number | null;
+  profileName: string | null;
 }
 
 export async function fetchConsultants(): Promise<ConsultantSummary[]> {
@@ -151,5 +153,14 @@ export async function fetchConsultants(): Promise<ConsultantSummary[]> {
 
 export async function fetchConsultant(userId: string): Promise<ConsultantDetail> {
   const response = await api.get<ConsultantDetail>(`/api/consultant/${userId}`);
+  return response.data;
+}
+
+export async function assignConsultantProfile(userId: string, profileId: number | null): Promise<void> {
+  await api.put(`/api/consultant/${userId}/profile`, { profileId });
+}
+
+export async function fetchConsultantSkills(userId: string): Promise<SkillCategory[]> {
+  const response = await api.get<SkillCategory[]>(`/api/consultant/${userId}/skills`);
   return response.data;
 }

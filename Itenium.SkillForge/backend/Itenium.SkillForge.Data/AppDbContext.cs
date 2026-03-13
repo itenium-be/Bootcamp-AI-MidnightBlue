@@ -58,5 +58,14 @@ public class AppDbContext : ForgeIdentityDbContext
                 .WithMany(x => x.ProfileSkills)
                 .HasForeignKey(x => x.SkillId);
         });
+
+        builder.Entity<ConsultantProfileEntity>(e =>
+        {
+            e.HasOne(x => x.Profile)
+                .WithMany()
+                .HasForeignKey(x => x.ProfileId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .IsRequired(false);
+        });
     }
 }
