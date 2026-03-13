@@ -98,9 +98,7 @@ export function TeamMembers() {
 
       {isLoading && <p className="text-muted-foreground">{t('common.loading')}</p>}
 
-      {!isLoading && consultants?.length === 0 && (
-        <p className="text-muted-foreground">{t('team.noConsultants')}</p>
-      )}
+      {!isLoading && consultants?.length === 0 && <p className="text-muted-foreground">{t('team.noConsultants')}</p>}
 
       {/* Inactive section */}
       {inactive.length > 0 && (
