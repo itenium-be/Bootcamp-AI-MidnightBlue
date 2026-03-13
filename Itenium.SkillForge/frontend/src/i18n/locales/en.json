@@ -105,6 +105,24 @@
     "active": "Active",
     "user": "User"
   },
+  "users": {
+    "title": "Users",
+    "name": "Name",
+    "email": "Email",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "role": "Role",
+    "teams": "Teams",
+    "password": "Temporary Password",
+    "addUser": "Add User",
+    "newUser": "New User",
+    "noUsers": "No users found",
+    "roles": {
+      "backoffice": "BackOffice",
+      "manager": "Manager",
+      "learner": "Learner"
+    }
+  },
   "errors": {
     "sessionExpired": "Session expired!",
     "internalServerError": "Internal Server Error!"
