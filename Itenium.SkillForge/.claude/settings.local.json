@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:\\\\Users\\\\Itenium-Alexander\\\\Bootcamp-AI-MidnightBlue\\\\Itenium.SkillForge\\\\frontend\" && bun run test 2>&1)",
+      "Bash(node --version && bun --version)",
+      "Bash(cd \"C:\\\\Users\\\\Itenium-Alexander\\\\Bootcamp-AI-MidnightBlue\\\\Itenium.SkillForge\\\\frontend\" && bun add -d jsdom@26 2>&1)",
+      "Bash(cd \"C:\\\\Users\\\\Itenium-Alexander\\\\Bootcamp-AI-MidnightBlue\\\\Itenium.SkillForge\\\\backend\" && dotnet test 2>&1)",
+      "Bash(cd \"C:\\\\Users\\\\Itenium-Alexander\\\\Bootcamp-AI-MidnightBlue\\\\Itenium.SkillForge\\\\backend\" && dotnet test Itenium.SkillForge.WebApi.Tests/Itenium.SkillForge.WebApi.Tests.csproj Itenium.SkillForge.Services.Tests/Itenium.SkillForge.Services.Tests.csproj 2>&1)",
+      "Bash(cd \"C:\\\\Users\\\\Itenium-Alexander\\\\Bootcamp-AI-MidnightBlue\\\\Itenium.SkillForge\\\\backend\" && dotnet test Itenium.SkillForge.WebApi.Tests/Itenium.SkillForge.WebApi.Tests.csproj 2>&1)",
+      "Bash(cd \"C:\\\\Users\\\\Itenium-Alexander\\\\Bootcamp-AI-MidnightBlue\\\\Itenium.SkillForge\\\\backend\" && dotnet test Itenium.SkillForge.WebApi.Tests/Itenium.SkillForge.WebApi.Tests.csproj -c Release 2>&1)",
+      "Bash(cd \"C:\\\\Users\\\\Itenium-Alexander\\\\Bootcamp-AI-MidnightBlue\\\\Itenium.SkillForge\\\\backend\" && dotnet test Itenium.SkillForge.Services.Tests/Itenium.SkillForge.Services.Tests.csproj -c Release 2>&1)"
+    ]
+  }
+}
