@@ -115,6 +115,9 @@
     "columnNiveau": "Niveau Range",
     "columnRating": "Rating",
     "noResources": "No resources found",
+    "columnCompleted": "Completed",
+    "markCompleted": "Mark as completed",
+    "completed": "Completed",
     "contribute": "Contribute Resource",
     "form": {
       "title": "Contribute a Resource",

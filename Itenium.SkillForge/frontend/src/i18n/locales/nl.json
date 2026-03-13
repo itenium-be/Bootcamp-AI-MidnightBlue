@@ -115,6 +115,9 @@
     "columnNiveau": "Niveaubereik",
     "columnRating": "Beoordeling",
     "noResources": "Geen resources gevonden",
+    "columnCompleted": "Voltooid",
+    "markCompleted": "Markeer als voltooid",
+    "completed": "Voltooid",
     "contribute": "Resource Toevoegen",
     "form": {
       "title": "Resource Toevoegen",

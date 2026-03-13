@@ -64,4 +64,49 @@ public class ResourceController : ControllerBase
 
         return CreatedAtAction(nameof(GetResources), new { id = resource.Id }, resource);
     }
+
+    /// <summary>
+    /// Get the IDs of resources the current user has completed.
+    /// </summary>
+    [HttpGet("completions")]
+    public async Task<ActionResult<List<int>>> GetMyCompletions()
+    {
+        var consultantId = User.Identity?.Name;
+        var ids = await _db.ResourceCompletions
+            .Where(c => c.ConsultantId == consultantId)
+            .Select(c => c.ResourceId)
+            .ToListAsync();
+        return Ok(ids);
+    }
+
+    /// <summary>
+    /// Mark a resource as completed. Idempotent — returns the existing record if already completed.
+    /// Accessible by all authenticated users (learner, manager, backoffice).
+    /// </summary>
+    [HttpPost("{id:int}/complete")]
+    public async Task<ActionResult<ResourceCompletionEntity>> MarkCompleted(int id)
+    {
+        var resource = await _db.Resources.FindAsync(id);
+        if (resource == null)
+            return NotFound();
+
+        var consultantId = User.Identity?.Name;
+
+        var existing = await _db.ResourceCompletions
+            .FirstOrDefaultAsync(c => c.ConsultantId == consultantId && c.ResourceId == id);
+
+        if (existing != null)
+            return Ok(existing);
+
+        var completion = new ResourceCompletionEntity
+        {
+            ConsultantId = consultantId!,
+            ResourceId = id,
+        };
+
+        _db.ResourceCompletions.Add(completion);
+        await _db.SaveChangesAsync();
+
+        return Ok(completion);
+    }
 }

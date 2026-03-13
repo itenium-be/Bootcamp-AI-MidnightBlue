@@ -108,3 +108,12 @@ export async function contributeResource(request: ContributeResourceRequest): Pr
   const response = await api.post<Resource>('/api/resource', request);
   return response.data;
 }
+
+export async function fetchMyCompletions(): Promise<number[]> {
+  const response = await api.get<number[]>('/api/resource/completions');
+  return response.data;
+}
+
+export async function markResourceCompleted(resourceId: number): Promise<void> {
+  await api.post(`/api/resource/${resourceId}/complete`);
+}

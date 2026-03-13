@@ -17,8 +17,14 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<ResourceEntity> Resources => Set<ResourceEntity>();
 
+    public DbSet<ResourceCompletionEntity> ResourceCompletions => Set<ResourceCompletionEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<ResourceCompletionEntity>()
+            .HasIndex(c => new { c.ConsultantId, c.ResourceId })
+            .IsUnique();
     }
 }

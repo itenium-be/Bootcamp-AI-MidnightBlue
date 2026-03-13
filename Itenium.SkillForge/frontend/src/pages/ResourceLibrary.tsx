@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, CheckCircle2 } from 'lucide-react';
 import {
   Button,
   Input,
@@ -24,6 +24,8 @@ import {
   fetchResources,
   fetchCourses,
   contributeResource,
+  fetchMyCompletions,
+  markResourceCompleted,
   type ContributeResourceRequest,
   type Resource,
   type ResourceType,
@@ -67,12 +69,24 @@ export function ResourceLibrary() {
     queryFn: fetchCourses,
   });
 
-  const mutation = useMutation({
+  const { data: completedIds = [] } = useQuery({
+    queryKey: ['resource-completions'],
+    queryFn: fetchMyCompletions,
+  });
+
+  const contributeMutation = useMutation({
     mutationFn: contributeResource,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resources'] });
       form.reset();
       setShowForm(false);
+    },
+  });
+
+  const completeMutation = useMutation({
+    mutationFn: markResourceCompleted,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resource-completions'] });
     },
   });
 
@@ -86,7 +100,7 @@ export function ResourceLibrary() {
       toLevel: data.toLevel ? parseInt(data.toLevel) : null,
       description: data.description || null,
     };
-    mutation.mutate(request);
+    contributeMutation.mutate(request);
   };
 
   if (isLoading) {
@@ -252,8 +266,8 @@ export function ResourceLibrary() {
             >
               {t('common.cancel')}
             </Button>
-            <Button type="submit" form="contribute-form" disabled={mutation.isPending}>
-              {mutation.isPending ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
+            <Button type="submit" form="contribute-form" disabled={contributeMutation.isPending}>
+              {contributeMutation.isPending ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
               {t('resourceLibrary.form.submit')}
             </Button>
           </CardFooter>
@@ -297,6 +311,7 @@ export function ResourceLibrary() {
               <th className="p-3 text-left font-medium">{t('resourceLibrary.columnSkill')}</th>
               <th className="p-3 text-left font-medium">{t('resourceLibrary.columnNiveau')}</th>
               <th className="p-3 text-left font-medium">{t('resourceLibrary.columnRating')}</th>
+              <th className="p-3 text-left font-medium">{t('resourceLibrary.columnCompleted')}</th>
             </tr>
           </thead>
           <tbody>
@@ -327,11 +342,28 @@ export function ResourceLibrary() {
                 <td className="p-3 text-muted-foreground">
                   👍 {resource.upvotes} / 👎 {resource.downvotes}
                 </td>
+                <td className="p-3">
+                  {completedIds.includes(resource.id) ? (
+                    <span className="flex items-center gap-1 text-sm text-green-600">
+                      <CheckCircle2 className="size-4" />
+                      {t('resourceLibrary.completed')}
+                    </span>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={completeMutation.isPending}
+                      onClick={() => completeMutation.mutate(resource.id)}
+                    >
+                      {t('resourceLibrary.markCompleted')}
+                    </Button>
+                  )}
+                </td>
               </tr>
             ))}
             {resources?.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-3 text-center text-muted-foreground">
+                <td colSpan={6} className="p-3 text-center text-muted-foreground">
                   {t('resourceLibrary.noResources')}
                 </td>
               </tr>
