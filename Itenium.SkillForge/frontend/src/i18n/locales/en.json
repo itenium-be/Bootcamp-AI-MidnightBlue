@@ -75,6 +75,17 @@
     "deleteCourse": "Delete Course",
     "noCourses": "No courses found"
   },
+  "skills": {
+    "title": "Skills",
+    "name": "Name",
+    "description": "Description",
+    "category": "Category",
+    "levelCount": "Niveau",
+    "levelDescriptors": "Level Descriptors",
+    "checkbox": "Checkbox",
+    "levels": "{{count}} levels",
+    "noSkills": "No skills found"
+  },
   "learners": {
     "title": "Learners",
     "name": "Name",

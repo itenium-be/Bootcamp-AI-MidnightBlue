@@ -75,6 +75,17 @@
     "deleteCourse": "Cursus Verwijderen",
     "noCourses": "Geen cursussen gevonden"
   },
+  "skills": {
+    "title": "Vaardigheden",
+    "name": "Naam",
+    "description": "Beschrijving",
+    "category": "Categorie",
+    "levelCount": "Niveau",
+    "levelDescriptors": "Niveau Omschrijvingen",
+    "checkbox": "Afvinken",
+    "levels": "{{count}} niveaus",
+    "noSkills": "Geen vaardigheden gevonden"
+  },
   "learners": {
     "title": "Leerlingen",
     "name": "Naam",

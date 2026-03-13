@@ -60,15 +60,16 @@ export async function fetchUserTeams(): Promise<Team[]> {
   return response.data;
 }
 
-interface Course {
+export interface Skill {
   id: number;
   name: string;
   description: string | null;
   category: string | null;
-  level: string | null;
+  levelCount: number;
+  levelDescriptors: string[];
 }
 
-export async function fetchCourses(): Promise<Course[]> {
-  const response = await api.get<Course[]>('/api/course');
+export async function fetchSkills(): Promise<Skill[]> {
+  const response = await api.get<Skill[]>('/api/skill');
   return response.data;
 }

@@ -1,9 +1,9 @@
-using Itenium.SkillForge.Entities;
-using Itenium.SkillForge.WebApi.Controllers;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Itenium.SkillForge.WebApi.Tests;
 
+// Renamed to SkillControllerTests — see SkillControllerTests.cs
+// CourseEntity was renamed to SkillEntity as part of SF-01
+
+/*
 [TestFixture]
 public class CourseControllerTests : DatabaseTestBase
 {
@@ -133,3 +133,4 @@ public class CourseControllerTests : DatabaseTestBase
         Assert.That(result, Is.TypeOf<NotFoundResult>());
     }
 }
+*/

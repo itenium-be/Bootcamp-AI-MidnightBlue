@@ -16,7 +16,7 @@ public static class SeedData
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         await SeedTeams(db);
-        await SeedCourses(db);
+        await SeedSkills(db);
         await app.SeedTestUsers();
     }
 
@@ -33,15 +33,15 @@ public static class SeedData
         }
     }
 
-    private static async Task SeedCourses(AppDbContext db)
+    private static async Task SeedSkills(AppDbContext db)
     {
-        if (!await db.Courses.AnyAsync())
+        if (!await db.Skills.AnyAsync())
         {
-            db.Courses.AddRange(
-                new CourseEntity { Id = 1, Name = "Introduction to Programming", Description = "Learn the basics of programming", Category = "Development", Level = "Beginner" },
-                new CourseEntity { Id = 2, Name = "Advanced C#", Description = "Master C# programming language", Category = "Development", Level = "Advanced" },
-                new CourseEntity { Id = 3, Name = "Cloud Architecture", Description = "Design scalable cloud solutions", Category = "Architecture", Level = "Intermediate" },
-                new CourseEntity { Id = 4, Name = "Agile Project Management", Description = "Learn agile methodologies", Category = "Management", Level = "Beginner" });
+            db.Skills.AddRange(
+                new SkillEntity { Id = 1, Name = "Introduction to Programming", Description = "Learn the basics of programming", Category = "Development", LevelCount = 1 },
+                new SkillEntity { Id = 2, Name = "Advanced C#", Description = "Master C# programming language", Category = "Development", LevelCount = 5, LevelDescriptors = ["Aware", "Beginner", "Practitioner", "Advanced", "Expert"] },
+                new SkillEntity { Id = 3, Name = "Cloud Architecture", Description = "Design scalable cloud solutions", Category = "Architecture", LevelCount = 3, LevelDescriptors = ["Aware", "Practitioner", "Expert"] },
+                new SkillEntity { Id = 4, Name = "Agile Project Management", Description = "Learn agile methodologies", Category = "Management", LevelCount = 1 });
             await db.SaveChangesAsync();
         }
     }
