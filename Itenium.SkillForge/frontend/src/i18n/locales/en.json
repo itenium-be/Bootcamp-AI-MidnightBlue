@@ -144,7 +144,14 @@
     "status": "Status",
     "active": "Active",
     "inactive": "Inactive",
-    "neverActive": "Never active"
+    "neverActive": "Never active",
+    "profile": "Competence Centre Profile",
+    "noProfile": "No profile assigned",
+    "assignProfile": "Assign profile",
+    "saveProfile": "Save",
+    "profileSaved": "Profile saved",
+    "skillRoadmap": "Skill Roadmap",
+    "noRoadmap": "Assign a competence centre profile to see the skill roadmap."
   },
   "errors": {
     "sessionExpired": "Session expired!",
