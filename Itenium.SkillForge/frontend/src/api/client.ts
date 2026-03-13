@@ -72,3 +72,31 @@ export async function fetchCourses(): Promise<Course[]> {
   const response = await api.get<Course[]>('/api/course');
   return response.data;
 }
+
+export interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  teamIds: number[];
+}
+
+export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  teamIds: number[];
+  password: string;
+}
+
+export async function fetchUsers(): Promise<User[]> {
+  const response = await api.get<User[]>('/api/user');
+  return response.data;
+}
+
+export async function createUser(request: CreateUserRequest): Promise<User> {
+  const response = await api.post<User>('/api/user', request);
+  return response.data;
+}

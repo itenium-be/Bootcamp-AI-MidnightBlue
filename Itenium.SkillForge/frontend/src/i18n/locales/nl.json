@@ -105,6 +105,24 @@
     "active": "Actief",
     "user": "Gebruiker"
   },
+  "users": {
+    "title": "Gebruikers",
+    "name": "Naam",
+    "email": "E-mail",
+    "firstName": "Voornaam",
+    "lastName": "Achternaam",
+    "role": "Rol",
+    "teams": "Teams",
+    "password": "Tijdelijk Wachtwoord",
+    "addUser": "Gebruiker Toevoegen",
+    "newUser": "Nieuwe Gebruiker",
+    "noUsers": "Geen gebruikers gevonden",
+    "roles": {
+      "backoffice": "BackOffice",
+      "manager": "Manager",
+      "learner": "Leerling"
+    }
+  },
   "errors": {
     "sessionExpired": "Sessie verlopen!",
     "internalServerError": "Interne serverfout!"
