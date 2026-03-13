@@ -144,5 +144,102 @@ public static class SeedData
                 await userManager.AddToRoleAsync(user, "learner");
             }
         }
+
+        // 5 example consultants for manual testing of user management
+
+        // Coached learner — Java team (java@test.local is active manager)
+        if (await userManager.FindByEmailAsync("alice.janssens@test.local") == null)
+        {
+            var user = new ForgeUser
+            {
+                UserName = "alice.janssens",
+                Email = "alice.janssens@test.local",
+                EmailConfirmed = true,
+                FirstName = "Alice",
+                LastName = "Janssens"
+            };
+            var result = await userManager.CreateAsync(user, "UserPassword123!");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "learner");
+                await userManager.AddClaimAsync(user, new Claim("team", "1")); // Java
+            }
+        }
+
+        // Coached learner — .NET team (dotnet@test.local is active manager)
+        if (await userManager.FindByEmailAsync("bob.peeters@test.local") == null)
+        {
+            var user = new ForgeUser
+            {
+                UserName = "bob.peeters",
+                Email = "bob.peeters@test.local",
+                EmailConfirmed = true,
+                FirstName = "Bob",
+                LastName = "Peeters"
+            };
+            var result = await userManager.CreateAsync(user, "UserPassword123!");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "learner");
+                await userManager.AddClaimAsync(user, new Claim("team", "2")); // .NET
+            }
+        }
+
+        // Coached learner — Java + .NET teams
+        if (await userManager.FindByEmailAsync("emma.martens@test.local") == null)
+        {
+            var user = new ForgeUser
+            {
+                UserName = "emma.martens",
+                Email = "emma.martens@test.local",
+                EmailConfirmed = true,
+                FirstName = "Emma",
+                LastName = "Martens"
+            };
+            var result = await userManager.CreateAsync(user, "UserPassword123!");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "learner");
+                await userManager.AddClaimAsync(user, new Claim("team", "1")); // Java
+                await userManager.AddClaimAsync(user, new Claim("team", "2")); // .NET
+            }
+        }
+
+        // Uncoached learner — QA team has no active manager
+        if (await userManager.FindByEmailAsync("clara.wouters@test.local") == null)
+        {
+            var user = new ForgeUser
+            {
+                UserName = "clara.wouters",
+                Email = "clara.wouters@test.local",
+                EmailConfirmed = true,
+                FirstName = "Clara",
+                LastName = "Wouters"
+            };
+            var result = await userManager.CreateAsync(user, "UserPassword123!");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "learner");
+                await userManager.AddClaimAsync(user, new Claim("team", "4")); // QA (no manager)
+            }
+        }
+
+        // Uncoached learner — no team assigned at all
+        if (await userManager.FindByEmailAsync("david.claes@test.local") == null)
+        {
+            var user = new ForgeUser
+            {
+                UserName = "david.claes",
+                Email = "david.claes@test.local",
+                EmailConfirmed = true,
+                FirstName = "David",
+                LastName = "Claes"
+            };
+            var result = await userManager.CreateAsync(user, "UserPassword123!");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "learner");
+            }
+        }
     }
 }
