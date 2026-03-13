@@ -27,7 +27,7 @@
     "catalog": "Browse Courses",
     "skills": "Skill Catalogue",
     "team": "Team",
-    "teamMembers": "Members",
+    "teamMembers": "My Consultants",
     "teamProgress": "Progress",
     "assignments": "Assignments",
     "coursesSection": "Courses",
@@ -120,6 +120,31 @@
     "noResults": "No results found",
     "active": "Active",
     "user": "User"
+  },
+  "team": {
+    "title": "My Consultants",
+    "subtitle": "Overview of all consultants on your team.",
+    "totalConsultants": "{{count}} consultant",
+    "totalConsultants_other": "{{count}} consultants",
+    "noConsultants": "No consultants found for your team.",
+    "viewProfile": "View Profile",
+    "inactiveSection": "Needs Attention ({{count}})",
+    "activeSection": "Active ({{count}})",
+    "inactiveDays": "Inactive {{count}} day",
+    "inactiveDays_other": "Inactive {{count}} days",
+    "activeDaysAgo": "Active {{count}} day ago",
+    "activeDaysAgo_other": "Active {{count}} days ago",
+    "neverActive": "Never active"
+  },
+  "consultant": {
+    "backToTeam": "Back to team",
+    "activity": "Activity",
+    "joinedOn": "Joined on",
+    "lastActive": "Last active",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "neverActive": "Never active"
   },
   "errors": {
     "sessionExpired": "Session expired!",

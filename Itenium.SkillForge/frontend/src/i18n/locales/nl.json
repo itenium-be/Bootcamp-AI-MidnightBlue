@@ -27,7 +27,7 @@
     "catalog": "Cursussen Bekijken",
     "skills": "Vaardighedencatalogus",
     "team": "Team",
-    "teamMembers": "Leden",
+    "teamMembers": "Mijn Consultants",
     "teamProgress": "Voortgang",
     "assignments": "Toewijzingen",
     "coursesSection": "Cursussen",
@@ -120,6 +120,31 @@
     "noResults": "Geen resultaten gevonden",
     "active": "Actief",
     "user": "Gebruiker"
+  },
+  "team": {
+    "title": "Mijn Consultants",
+    "subtitle": "Overzicht van alle consultants in uw team.",
+    "totalConsultants": "{{count}} consultant",
+    "totalConsultants_other": "{{count}} consultants",
+    "noConsultants": "Geen consultants gevonden voor uw team.",
+    "viewProfile": "Profiel Bekijken",
+    "inactiveSection": "Aandacht Vereist ({{count}})",
+    "activeSection": "Actief ({{count}})",
+    "inactiveDays": "Inactief {{count}} dag",
+    "inactiveDays_other": "Inactief {{count}} dagen",
+    "activeDaysAgo": "Actief {{count}} dag geleden",
+    "activeDaysAgo_other": "Actief {{count}} dagen geleden",
+    "neverActive": "Nooit actief"
+  },
+  "consultant": {
+    "backToTeam": "Terug naar team",
+    "activity": "Activiteit",
+    "joinedOn": "Lid geworden op",
+    "lastActive": "Laatste activiteit",
+    "status": "Status",
+    "active": "Actief",
+    "inactive": "Inactief",
+    "neverActive": "Nooit actief"
   },
   "errors": {
     "sessionExpired": "Sessie verlopen!",

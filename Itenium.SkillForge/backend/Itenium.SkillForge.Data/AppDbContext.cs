@@ -25,6 +25,8 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<CompetenceCentreProfileSkillEntity> CompetenceCentreProfileSkills => Set<CompetenceCentreProfileSkillEntity>();
 
+    public DbSet<ConsultantProfileEntity> ConsultantProfiles => Set<ConsultantProfileEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

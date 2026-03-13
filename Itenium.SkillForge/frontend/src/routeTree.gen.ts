@@ -15,6 +15,8 @@ import { Route as AuthenticatedSkillsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedCoursesRouteImport } from './routes/_authenticated/courses'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
+import { Route as AuthenticatedTeamMembersRouteImport } from './routes/_authenticated/team.members'
+import { Route as AuthenticatedConsultantUserIdRouteImport } from './routes/_authenticated/consultant.$userId'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -45,6 +47,18 @@ const authSignInRoute = authSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTeamMembersRoute =
+  AuthenticatedTeamMembersRouteImport.update({
+    id: '/team/members',
+    path: '/team/members',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsultantUserIdRoute =
+  AuthenticatedConsultantUserIdRouteImport.update({
+    id: '/consultant/$userId',
+    path: '/consultant/$userId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/sign-in': typeof authSignInRoute
@@ -52,6 +66,8 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/skills': typeof AuthenticatedSkillsRoute
   '/': typeof AuthenticatedIndexRoute
+  '/consultant/$userId': typeof AuthenticatedConsultantUserIdRoute
+  '/team/members': typeof AuthenticatedTeamMembersRoute
 }
 export interface FileRoutesByTo {
   '/sign-in': typeof authSignInRoute
@@ -59,6 +75,8 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/skills': typeof AuthenticatedSkillsRoute
   '/': typeof AuthenticatedIndexRoute
+  '/consultant/$userId': typeof AuthenticatedConsultantUserIdRoute
+  '/team/members': typeof AuthenticatedTeamMembersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +86,28 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/skills': typeof AuthenticatedSkillsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/consultant/$userId': typeof AuthenticatedConsultantUserIdRoute
+  '/_authenticated/team/members': typeof AuthenticatedTeamMembersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/sign-in' | '/courses' | '/settings' | '/skills' | '/'
+  fullPaths:
+    | '/sign-in'
+    | '/courses'
+    | '/settings'
+    | '/skills'
+    | '/'
+    | '/consultant/$userId'
+    | '/team/members'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sign-in' | '/courses' | '/settings' | '/skills' | '/'
+  to:
+    | '/sign-in'
+    | '/courses'
+    | '/settings'
+    | '/skills'
+    | '/'
+    | '/consultant/$userId'
+    | '/team/members'
   id:
     | '__root__'
     | '/_authenticated'
@@ -82,6 +116,8 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/skills'
     | '/_authenticated/'
+    | '/_authenticated/consultant/$userId'
+    | '/_authenticated/team/members'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -133,6 +169,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/team/members': {
+      id: '/_authenticated/team/members'
+      path: '/team/members'
+      fullPath: '/team/members'
+      preLoaderRoute: typeof AuthenticatedTeamMembersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/consultant/$userId': {
+      id: '/_authenticated/consultant/$userId'
+      path: '/consultant/$userId'
+      fullPath: '/consultant/$userId'
+      preLoaderRoute: typeof AuthenticatedConsultantUserIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -141,6 +191,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSkillsRoute: typeof AuthenticatedSkillsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedConsultantUserIdRoute: typeof AuthenticatedConsultantUserIdRoute
+  AuthenticatedTeamMembersRoute: typeof AuthenticatedTeamMembersRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -148,6 +200,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSkillsRoute: AuthenticatedSkillsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedConsultantUserIdRoute: AuthenticatedConsultantUserIdRoute,
+  AuthenticatedTeamMembersRoute: AuthenticatedTeamMembersRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

@@ -19,6 +19,7 @@ public static class SeedData
         await SeedCourses(db);
         await SeedSkillCatalogue(db);
         await app.SeedTestUsers();
+        await app.SeedConsultants(db);
     }
 
     private static async Task SeedTeams(AppDbContext db)
@@ -759,5 +760,76 @@ public static class SeedData
                 await userManager.AddToRoleAsync(user, "learner");
             }
         }
+    }
+
+    private static async Task SeedConsultants(this WebApplication app, AppDbContext db)
+    {
+        if (await db.ConsultantProfiles.AnyAsync())
+        {
+            return;
+        }
+
+        using var scope = app.Services.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ForgeUser>>();
+
+        // Seed data: (email, firstName, lastName, teamId, daysAgoActivity)
+        // null daysAgo = never active (shown as inactive)
+        (string Email, string First, string Last, int TeamId, int? DaysAgo)[] consultants =
+        [
+            // .NET team — coach: dotnet@test.local (team 2)
+            ("lea@test.local",    "Lea",    "Van Den Berg", 2, 2),    // active
+            ("thomas@test.local", "Thomas", "De Smedt",     2, 25),   // inactive — no activity 25 days
+            ("amber@test.local",  "Amber",  "Jacobs",       2, 8),    // active
+            ("olivier@test.local","Olivier","Maes",          2, null), // inactive — never active
+
+            // Java team — coach: java@test.local (team 1)
+            ("sander@test.local", "Sander", "Claes",        1, 1),    // active
+            ("lucas@test.local",  "Lucas",  "Peeters",      1, 30),   // inactive
+            ("emma@test.local",   "Emma",   "Willems",      1, 5),    // active
+
+            // QA team (team 4)
+            ("sophie@test.local", "Sophie", "Goossens",     4, 10),   // active
+            ("noah@test.local",   "Noah",   "Vermeersch",   4, 28),   // inactive
+
+            // PO & Analysis team (team 3)
+            ("julie@test.local",  "Julie",  "Dubois",       3, 3),    // active
+            ("max@test.local",    "Max",    "Leemans",      3, null),  // inactive — never active
+        ];
+
+        foreach (var (email, first, last, teamId, daysAgo) in consultants)
+        {
+            if (await userManager.FindByEmailAsync(email) != null)
+            {
+                continue;
+            }
+
+            var user = new ForgeUser
+            {
+                UserName = email.Split('@')[0],
+                Email = email,
+                EmailConfirmed = true,
+                FirstName = first,
+                LastName = last,
+            };
+
+            var result = await userManager.CreateAsync(user, "UserPassword123!");
+            if (!result.Succeeded)
+            {
+                continue;
+            }
+
+            await userManager.AddToRoleAsync(user, "learner");
+
+            db.ConsultantProfiles.Add(new ConsultantProfileEntity
+            {
+                UserId = user.Id,
+                TeamId = teamId,
+                LastActivityAt = daysAgo.HasValue
+                    ? DateTime.UtcNow.AddDays(-daysAgo.Value)
+                    : null,
+            });
+        }
+
+        await db.SaveChangesAsync();
     }
 }

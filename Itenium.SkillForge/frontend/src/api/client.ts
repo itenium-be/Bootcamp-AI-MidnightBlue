@@ -128,3 +128,28 @@ export async function fetchProfileSkills(profileId: number): Promise<SkillSummar
   const response = await api.get<SkillSummary[]>(`/api/profile/${profileId}/skills`);
   return response.data;
 }
+
+export interface ConsultantSummary {
+  userId: string;
+  displayName: string;
+  email: string;
+  teamId: number;
+  teamName: string;
+  lastActivityAt: string | null;
+  isInactive: boolean;
+  daysSinceActivity: number | null;
+}
+
+export interface ConsultantDetail extends ConsultantSummary {
+  createdAt: string;
+}
+
+export async function fetchConsultants(): Promise<ConsultantSummary[]> {
+  const response = await api.get<ConsultantSummary[]>('/api/consultant');
+  return response.data;
+}
+
+export async function fetchConsultant(userId: string): Promise<ConsultantDetail> {
+  const response = await api.get<ConsultantDetail>(`/api/consultant/${userId}`);
+  return response.data;
+}
