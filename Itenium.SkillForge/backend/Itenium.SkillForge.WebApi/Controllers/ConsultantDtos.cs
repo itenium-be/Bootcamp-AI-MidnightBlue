@@ -26,3 +26,17 @@ public record ConsultantDetailDto(
 );
 
 public record AssignProfileRequest(int? ProfileId);
+
+public record RoadmapSkillDto(
+    int Id,
+    string Name,
+    string Category,
+    string? Description,
+    int LevelCount,
+    IReadOnlyList<SkillPrerequisiteDto> UnmetPrerequisites
+);
+
+public record RoadmapCategoryDto(
+    string Category,
+    IReadOnlyList<RoadmapSkillDto> Skills
+);

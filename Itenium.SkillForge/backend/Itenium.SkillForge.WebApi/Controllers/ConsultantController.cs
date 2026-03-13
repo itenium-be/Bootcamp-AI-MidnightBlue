@@ -146,27 +146,45 @@ public class ConsultantController : ControllerBase
     }
 
     /// <summary>
-    /// Get the skills for a consultant filtered by their assigned competence centre profile.
+    /// Get the roadmap skills for a consultant filtered by their assigned competence centre profile.
+    /// Each skill is annotated with any unmet prerequisites based on the consultant's current skill levels.
+    /// Skills with unmet prerequisites are warned (never locked).
     /// </summary>
     [HttpGet("{userId}/skills")]
-    public async Task<ActionResult<IReadOnlyList<SkillCategoryDto>>> GetConsultantSkills(string userId)
+    public async Task<ActionResult<IReadOnlyList<RoadmapCategoryDto>>> GetConsultantSkills(string userId)
     {
         var consultantProfile = await _db.ConsultantProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
         if (consultantProfile == null) return NotFound();
         if (!_user.IsBackOffice && !_user.Teams.Contains(consultantProfile.TeamId)) return NotFound();
 
-        if (consultantProfile.ProfileId == null) return Ok(Array.Empty<SkillCategoryDto>());
+        if (consultantProfile.ProfileId == null) return Ok(Array.Empty<RoadmapCategoryDto>());
 
         var skills = await _db.CompetenceCentreProfileSkills
             .Where(ps => ps.ProfileId == consultantProfile.ProfileId)
             .Include(ps => ps.Skill)
-            .Select(ps => new SkillSummaryDto(ps.Skill.Id, ps.Skill.Name, ps.Skill.Category, ps.Skill.Description, ps.Skill.LevelCount))
+                .ThenInclude(s => s.Prerequisites)
+                    .ThenInclude(p => p.RequiredSkill)
+            .Select(ps => ps.Skill)
             .ToListAsync();
 
-        var categories = skills
+        var currentLevels = await _db.ConsultantSkillLevels
+            .Where(l => l.UserId == userId)
+            .ToDictionaryAsync(l => l.SkillId, l => l.CurrentLevel);
+
+        var roadmapSkills = skills.Select(skill =>
+        {
+            var unmetPrereqs = skill.Prerequisites
+                .Where(p => currentLevels.GetValueOrDefault(p.RequiredSkillId, 0) < p.RequiredLevel)
+                .Select(p => new SkillPrerequisiteDto(p.RequiredSkillId, p.RequiredSkill.Name, p.RequiredLevel))
+                .ToList();
+
+            return new RoadmapSkillDto(skill.Id, skill.Name, skill.Category, skill.Description, skill.LevelCount, unmetPrereqs);
+        }).ToList();
+
+        var categories = roadmapSkills
             .GroupBy(s => s.Category, StringComparer.Ordinal)
             .OrderBy(g => g.Key, StringComparer.Ordinal)
-            .Select(g => new SkillCategoryDto(g.Key, g.OrderBy(s => s.Name, StringComparer.Ordinal).ToList()))
+            .Select(g => new RoadmapCategoryDto(g.Key, g.OrderBy(s => s.Name, StringComparer.Ordinal).ToList()))
             .ToList();
 
         return Ok(categories);

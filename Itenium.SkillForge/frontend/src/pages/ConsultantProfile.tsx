@@ -9,8 +9,41 @@ import {
   fetchProfiles,
   assignConsultantProfile,
   fetchConsultantSkills,
+  type ConsultantDetail,
+  type RoadmapCategory,
+  type RoadmapSkill,
 } from '@/api/client';
 import { useAuthStore } from '@/stores';
+
+export function RoadmapSkillRow({ skill }: { skill: RoadmapSkill }) {
+  const { t } = useTranslation();
+  const hasWarning = skill.unmetPrerequisites.length > 0;
+
+  return (
+    <li className="rounded-md px-3 py-2 text-sm hover:bg-muted/40">
+      <div className="flex items-center justify-between">
+        <span className="flex items-center gap-2">
+          <ChevronRight className="size-3 text-muted-foreground shrink-0" />
+          {skill.name}
+        </span>
+        <Badge variant="outline" className="text-xs">
+          {skill.levelCount === 1 ? t('skills.checkbox') : t('skills.levels', { count: skill.levelCount })}
+        </Badge>
+      </div>
+      {hasWarning && (
+        <div className="flex items-start gap-2 mt-1 ml-5 text-xs text-amber-600 dark:text-amber-400">
+          <AlertTriangle className="size-3 mt-0.5 shrink-0" />
+          <span>
+            {t('consultant.prerequisiteWarning')}:{' '}
+            {skill.unmetPrerequisites
+              .map((p) => `${p.requiredSkillName} ${t('skills.niveau')} ${p.requiredLevel}`)
+              .join(', ')}
+          </span>
+        </div>
+      )}
+    </li>
+  );
+}
 
 interface ConsultantProfileProps {
   userId: string;
@@ -29,7 +62,7 @@ export function ConsultantProfile({ userId }: ConsultantProfileProps) {
     data: consultant,
     isLoading,
     isError,
-  } = useQuery({
+  } = useQuery<ConsultantDetail>({
     queryKey: ['consultant', userId],
     queryFn: () => fetchConsultant(userId),
   });
@@ -40,7 +73,7 @@ export function ConsultantProfile({ userId }: ConsultantProfileProps) {
     enabled: canAssign,
   });
 
-  const { data: skillCategories } = useQuery({
+  const { data: roadmapCategories } = useQuery<RoadmapCategory[]>({
     queryKey: ['consultant', userId, 'skills'],
     queryFn: () => fetchConsultantSkills(userId),
     enabled: !!consultant,
@@ -181,9 +214,7 @@ export function ConsultantProfile({ userId }: ConsultantProfileProps) {
             <select
               className="flex-1 rounded-md border bg-background px-3 py-2 text-sm"
               value={currentProfileId ?? ''}
-              onChange={(e) =>
-                setDraftProfileId(e.target.value === '' ? null : Number(e.target.value))
-              }
+              onChange={(e) => setDraftProfileId(e.target.value === '' ? null : Number(e.target.value))}
             >
               <option value="">{t('consultant.noProfile')}</option>
               {profiles.map((p) => (
@@ -201,9 +232,7 @@ export function ConsultantProfile({ userId }: ConsultantProfileProps) {
             </Button>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">
-            {consultant.profileName ?? t('consultant.noProfile')}
-          </p>
+          <p className="text-sm text-muted-foreground">{consultant.profileName ?? t('consultant.noProfile')}</p>
         )}
         {assignMutation.isSuccess && draftProfileId === 'unset' && (
           <p className="text-sm text-green-600 dark:text-green-400">{t('consultant.profileSaved')}</p>
@@ -215,29 +244,18 @@ export function ConsultantProfile({ userId }: ConsultantProfileProps) {
         <h2 className="font-semibold">{t('consultant.skillRoadmap')}</h2>
         {!consultant.profileId ? (
           <p className="text-sm text-muted-foreground">{t('consultant.noRoadmap')}</p>
-        ) : !skillCategories || skillCategories.length === 0 ? (
+        ) : !roadmapCategories || roadmapCategories.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
         ) : (
           <div className="space-y-4">
-            {skillCategories.map((cat) => (
+            {roadmapCategories.map((cat) => (
               <div key={cat.category}>
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
                   {cat.category}
                 </h3>
                 <ul className="space-y-1">
                   {cat.skills.map((skill) => (
-                    <li
-                      key={skill.id}
-                      className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted/40"
-                    >
-                      <span className="flex items-center gap-2">
-                        <ChevronRight className="size-3 text-muted-foreground shrink-0" />
-                        {skill.name}
-                      </span>
-                      <Badge variant="outline" className="text-xs">
-                        {skill.levelCount === 1 ? t('skills.checkbox') : t('skills.levels', { count: skill.levelCount })}
-                      </Badge>
-                    </li>
+                    <RoadmapSkillRow key={skill.id} skill={skill} />
                   ))}
                 </ul>
               </div>

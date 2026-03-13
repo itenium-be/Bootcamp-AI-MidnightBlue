@@ -151,7 +151,8 @@
     "saveProfile": "Save",
     "profileSaved": "Profile saved",
     "skillRoadmap": "Skill Roadmap",
-    "noRoadmap": "Assign a competence centre profile to see the skill roadmap."
+    "noRoadmap": "Assign a competence centre profile to see the skill roadmap.",
+    "prerequisiteWarning": "Prerequisites not yet met"
   },
   "errors": {
     "sessionExpired": "Session expired!",

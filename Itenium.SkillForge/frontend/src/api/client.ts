@@ -102,6 +102,15 @@ export interface SkillCategory {
   skills: SkillSummary[];
 }
 
+export interface RoadmapSkill extends SkillSummary {
+  unmetPrerequisites: SkillPrerequisite[];
+}
+
+export interface RoadmapCategory {
+  category: string;
+  skills: RoadmapSkill[];
+}
+
 export interface CompetenceCentreProfile {
   id: number;
   name: string;
@@ -160,7 +169,7 @@ export async function assignConsultantProfile(userId: string, profileId: number 
   await api.put(`/api/consultant/${userId}/profile`, { profileId });
 }
 
-export async function fetchConsultantSkills(userId: string): Promise<SkillCategory[]> {
-  const response = await api.get<SkillCategory[]>(`/api/consultant/${userId}/skills`);
+export async function fetchConsultantSkills(userId: string): Promise<RoadmapCategory[]> {
+  const response = await api.get<RoadmapCategory[]>(`/api/consultant/${userId}/skills`);
   return response.data;
 }

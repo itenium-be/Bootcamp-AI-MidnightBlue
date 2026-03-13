@@ -151,7 +151,8 @@
     "saveProfile": "Opslaan",
     "profileSaved": "Profiel opgeslagen",
     "skillRoadmap": "Vaardigheden Roadmap",
-    "noRoadmap": "Wijs een competentiecentrum profiel toe om de vaardigheden roadmap te zien."
+    "noRoadmap": "Wijs een competentiecentrum profiel toe om de vaardigheden roadmap te zien.",
+    "prerequisiteWarning": "Vereisten nog niet behaald"
   },
   "errors": {
     "sessionExpired": "Sessie verlopen!",

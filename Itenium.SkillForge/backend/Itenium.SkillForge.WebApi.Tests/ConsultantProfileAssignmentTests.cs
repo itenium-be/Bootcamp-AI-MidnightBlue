@@ -204,7 +204,7 @@ public class ConsultantProfileAssignmentTests : DatabaseTestBase
 
         var ok = result.Result as OkObjectResult;
         Assert.That(ok, Is.Not.Null);
-        var categories = ok!.Value as IReadOnlyList<SkillCategoryDto>;
+        var categories = ok!.Value as IReadOnlyList<RoadmapCategoryDto>;
         Assert.That(categories, Is.Not.Null);
         Assert.That(categories!.Count, Is.EqualTo(2));
 
@@ -230,7 +230,7 @@ public class ConsultantProfileAssignmentTests : DatabaseTestBase
 
         var ok = result.Result as OkObjectResult;
         Assert.That(ok, Is.Not.Null);
-        var items = ok!.Value as SkillCategoryDto[];
+        var items = ok!.Value as RoadmapCategoryDto[];
         Assert.That(items, Is.Empty);
     }
 

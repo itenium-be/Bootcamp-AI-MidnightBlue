@@ -8,6 +8,8 @@ import {
   fetchProfiles,
   fetchProfileSkills,
   type SkillCategory,
+  type SkillDetail,
+  type SkillLevelDescriptor,
   type SkillSummary,
   type CompetenceCentreProfile,
 } from '@/api/client';
@@ -24,7 +26,7 @@ function SkillRow({ skill }: { skill: SkillSummary }) {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
 
-  const { data: detail, isLoading } = useQuery({
+  const { data: detail, isLoading } = useQuery<SkillDetail>({
     queryKey: ['skill', skill.id],
     queryFn: async () => {
       const { fetchSkill } = await import('@/api/client');
@@ -65,7 +67,7 @@ function SkillRow({ skill }: { skill: SkillSummary }) {
                 )}
                 {detail.levelDescriptors.length > 0 && (
                   <ol className="space-y-1 text-sm list-none">
-                    {detail.levelDescriptors.map((d) => (
+                    {detail.levelDescriptors.map((d: SkillLevelDescriptor) => (
                       <li key={d.level} className="flex gap-2">
                         <span className="font-semibold text-primary w-6 shrink-0">
                           {detail.levelCount === 1 ? '✓' : d.level}

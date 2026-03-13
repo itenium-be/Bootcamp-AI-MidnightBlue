@@ -27,6 +27,8 @@ public class AppDbContext : ForgeIdentityDbContext
 
     public DbSet<ConsultantProfileEntity> ConsultantProfiles => Set<ConsultantProfileEntity>();
 
+    public DbSet<ConsultantSkillLevelEntity> ConsultantSkillLevels => Set<ConsultantSkillLevelEntity>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -66,6 +68,16 @@ public class AppDbContext : ForgeIdentityDbContext
                 .HasForeignKey(x => x.ProfileId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .IsRequired(false);
+        });
+
+        builder.Entity<ConsultantSkillLevelEntity>(e =>
+        {
+            e.HasKey(x => new { x.UserId, x.SkillId });
+
+            e.HasOne(x => x.Skill)
+                .WithMany()
+                .HasForeignKey(x => x.SkillId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
