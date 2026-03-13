@@ -321,8 +321,8 @@ export function Layout() {
             </SidebarGroupContent>
           </SidebarGroup>
 
-          {/* Team - shown for managers (not learners) */}
-          {mode === 'manager' && !isLearnerOnly && (
+          {/* Team - shown for managers and backoffice */}
+          {!isLearnerOnly && (
             <SidebarGroup>
               <SidebarGroupLabel>{t('nav.team')}</SidebarGroupLabel>
               <SidebarGroupContent>
