@@ -20,5 +20,23 @@ public record ConsultantDetailDto(
     DateTime? LastActivityAt,
     bool IsInactive,
     int? DaysSinceActivity,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    int? ProfileId,
+    string? ProfileName
+);
+
+public record AssignProfileRequest(int? ProfileId);
+
+public record RoadmapSkillDto(
+    int Id,
+    string Name,
+    string Category,
+    string? Description,
+    int LevelCount,
+    IReadOnlyList<SkillPrerequisiteDto> UnmetPrerequisites
+);
+
+public record RoadmapCategoryDto(
+    string Category,
+    IReadOnlyList<RoadmapSkillDto> Skills
 );

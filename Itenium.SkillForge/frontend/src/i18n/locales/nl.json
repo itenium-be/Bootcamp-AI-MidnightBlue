@@ -145,7 +145,15 @@
     "status": "Status",
     "active": "Actief",
     "inactive": "Inactief",
-    "neverActive": "Nooit actief"
+    "neverActive": "Nooit actief",
+    "profile": "Competentiecentrum Profiel",
+    "noProfile": "Geen profiel toegewezen",
+    "assignProfile": "Profiel toewijzen",
+    "saveProfile": "Opslaan",
+    "profileSaved": "Profiel opgeslagen",
+    "skillRoadmap": "Vaardigheden Roadmap",
+    "noRoadmap": "Wijs een competentiecentrum profiel toe om de vaardigheden roadmap te zien.",
+    "prerequisiteWarning": "Vereisten nog niet behaald"
   },
   "resources": {
     "title": "Bronnenbibliotheek",

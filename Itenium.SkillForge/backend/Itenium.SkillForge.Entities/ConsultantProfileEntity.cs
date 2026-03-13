@@ -15,6 +15,9 @@ public class ConsultantProfileEntity
     public int TeamId { get; set; }
     public TeamEntity Team { get; set; } = null!;
 
+    public int? ProfileId { get; set; }
+    public CompetenceCentreProfileEntity? Profile { get; set; }
+
     /// <summary>
     /// Last time the consultant performed any action in the platform.
     /// Null means never active. Used to surface inactive consultants (>21 days).

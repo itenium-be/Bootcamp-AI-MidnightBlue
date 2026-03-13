@@ -781,6 +781,24 @@ public static class SeedData
                 await userManager.AddClaimAsync(user, new Claim("team", "2")); // .NET team → CoachNicolas
             }
         }
+
+        if (await userManager.FindByEmailAsync("coachnicolas@test.local") == null)
+        {
+            var coach = new ForgeUser
+            {
+                UserName = "CoachNicolas",
+                Email = "coachnicolas@test.local",
+                EmailConfirmed = true,
+                FirstName = "Nicolas",
+                LastName = "Coach"
+            };
+            var result = await userManager.CreateAsync(coach, "Azerty123;");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(coach, "manager");
+                await userManager.AddClaimAsync(coach, new Claim("team", "2")); // .NET team
+            }
+        }
     }
 
     private static async Task SeedConsultants(this WebApplication app, AppDbContext db)
@@ -788,32 +806,34 @@ public static class SeedData
         using var scope = app.Services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ForgeUser>>();
 
-        // Seed data: (email, firstName, lastName, teamId, daysAgoActivity)
+        // Seed data: (email, firstName, lastName, teamId, daysAgoActivity, profileId)
         // null daysAgo = never active (shown as inactive)
-        (string Email, string First, string Last, int TeamId, int? DaysAgo)[] consultants =
+        // Profile mapping: TeamId 2 (.NET) → ProfileId 1, TeamId 1 (Java) → ProfileId 2,
+        //                  TeamId 4 (QA) → ProfileId 3, TeamId 3 (PO) → ProfileId 4
+        (string Email, string First, string Last, int TeamId, int? DaysAgo, int? ProfileId)[] consultants =
         [
             // .NET team — coach: dotnet@test.local + CoachNicolas (team 2)
-            ("learner@test.local", "Test",    "Learner",      2, 3),    // active — pre-existing user
-            ("lea@test.local",     "Lea",     "Van Den Berg", 2, 2),    // active
-            ("thomas@test.local",  "Thomas",  "De Smedt",     2, 25),   // inactive — no activity 25 days
-            ("amber@test.local",   "Amber",   "Jacobs",       2, 8),    // active
-            ("olivier@test.local", "Olivier", "Maes",         2, null), // inactive — never active
+            ("learner@test.local", "Test",    "Learner",      2, 3,    1),  // active — pre-existing user
+            ("lea@test.local",     "Lea",     "Van Den Berg", 2, 2,    1),  // active
+            ("thomas@test.local",  "Thomas",  "De Smedt",     2, 25,   1),  // inactive — no activity 25 days
+            ("amber@test.local",   "Amber",   "Jacobs",       2, 8,    1),  // active
+            ("olivier@test.local", "Olivier", "Maes",         2, null, 1),  // inactive — never active
 
             // Java team — coach: java@test.local (team 1)
-            ("sander@test.local", "Sander", "Claes",        1, 1),    // active
-            ("lucas@test.local",  "Lucas",  "Peeters",      1, 30),   // inactive
-            ("emma@test.local",   "Emma",   "Willems",      1, 5),    // active
+            ("sander@test.local", "Sander", "Claes",        1, 1,    2),  // active
+            ("lucas@test.local",  "Lucas",  "Peeters",      1, 30,   2),  // inactive
+            ("emma@test.local",   "Emma",   "Willems",      1, 5,    2),  // active
 
             // QA team (team 4)
-            ("sophie@test.local", "Sophie", "Goossens",     4, 10),   // active
-            ("noah@test.local",   "Noah",   "Vermeersch",   4, 28),   // inactive
+            ("sophie@test.local", "Sophie", "Goossens",     4, 10,   3),  // active
+            ("noah@test.local",   "Noah",   "Vermeersch",   4, 28,   3),  // inactive
 
             // PO & Analysis team (team 3)
-            ("julie@test.local",  "Julie",  "Dubois",       3, 3),    // active
-            ("max@test.local",    "Max",    "Leemans",      3, null),  // inactive — never active
+            ("julie@test.local",  "Julie",  "Dubois",       3, 3,    4),  // active
+            ("max@test.local",    "Max",    "Leemans",      3, null,  4),  // inactive — never active
         ];
 
-        foreach (var (email, first, last, teamId, daysAgo) in consultants)
+        foreach (var (email, first, last, teamId, daysAgo, profileId) in consultants)
         {
             var existingUser = await userManager.FindByEmailAsync(email);
             if (existingUser == null)
@@ -844,6 +864,7 @@ public static class SeedData
                 {
                     UserId = existingUser.Id,
                     TeamId = teamId,
+                    ProfileId = profileId,
                     LastActivityAt = daysAgo.HasValue
                         ? DateTime.UtcNow.AddDays(-daysAgo.Value)
                         : null,

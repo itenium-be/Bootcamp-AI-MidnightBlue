@@ -102,6 +102,15 @@ export interface SkillCategory {
   skills: SkillSummary[];
 }
 
+export interface RoadmapSkill extends SkillSummary {
+  unmetPrerequisites: SkillPrerequisite[];
+}
+
+export interface RoadmapCategory {
+  category: string;
+  skills: RoadmapSkill[];
+}
+
 export interface CompetenceCentreProfile {
   id: number;
   name: string;
@@ -142,6 +151,8 @@ export interface ConsultantSummary {
 
 export interface ConsultantDetail extends ConsultantSummary {
   createdAt: string;
+  profileId: number | null;
+  profileName: string | null;
 }
 
 export async function fetchConsultants(): Promise<ConsultantSummary[]> {
@@ -202,4 +213,13 @@ export async function rateResource(id: number, isPositive: boolean): Promise<voi
 
 export async function removeResourceRating(id: number): Promise<void> {
   await api.delete(`/api/resource/${id}/rate`);
+}
+
+export async function assignConsultantProfile(userId: string, profileId: number | null): Promise<void> {
+  await api.put(`/api/consultant/${userId}/profile`, { profileId });
+}
+
+export async function fetchConsultantSkills(userId: string): Promise<RoadmapCategory[]> {
+  const response = await api.get<RoadmapCategory[]>(`/api/consultant/${userId}/skills`);
+  return response.data;
 }
