@@ -17,11 +17,7 @@ function LevelBadge({ levelCount }: { levelCount: number }) {
   if (levelCount === 1) {
     return <Badge variant="secondary">{t('skills.checkbox')}</Badge>;
   }
-  return (
-    <Badge variant="outline">
-      {t('skills.levels', { count: levelCount })}
-    </Badge>
-  );
+  return <Badge variant="outline">{t('skills.levels', { count: levelCount })}</Badge>;
 }
 
 function SkillRow({ skill }: { skill: SkillSummary }) {
@@ -39,10 +35,7 @@ function SkillRow({ skill }: { skill: SkillSummary }) {
 
   return (
     <>
-      <tr
-        className="border-b hover:bg-muted/40 cursor-pointer"
-        onClick={() => setOpen((v) => !v)}
-      >
+      <tr className="border-b hover:bg-muted/40 cursor-pointer" onClick={() => setOpen((v) => !v)}>
         <td className="p-3 w-6 text-muted-foreground">
           {open ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
         </td>
@@ -96,10 +89,7 @@ function CategorySection({ category }: { category: SkillCategory }) {
 
   return (
     <>
-      <tr
-        className="bg-muted/50 cursor-pointer select-none"
-        onClick={() => setCollapsed((v) => !v)}
-      >
+      <tr className="bg-muted/50 cursor-pointer select-none" onClick={() => setCollapsed((v) => !v)}>
         <td className="p-3 w-6">
           {collapsed ? <ChevronRight className="size-4" /> : <ChevronDown className="size-4" />}
         </td>
@@ -155,9 +145,7 @@ export function SkillCatalogue() {
 
   const displayedCategories = selectedProfileId === null ? (catalogue ?? []) : profileCategories;
 
-  const selectedProfile: CompetenceCentreProfile | undefined = profiles?.find(
-    (p) => p.id === selectedProfileId,
-  );
+  const selectedProfile: CompetenceCentreProfile | undefined = profiles?.find((p) => p.id === selectedProfileId);
 
   return (
     <div className="space-y-6">
@@ -190,9 +178,7 @@ export function SkillCatalogue() {
         ))}
       </div>
 
-      {selectedProfile && (
-        <p className="text-sm text-muted-foreground">{selectedProfile.description}</p>
-      )}
+      {selectedProfile && <p className="text-sm text-muted-foreground">{selectedProfile.description}</p>}
 
       {/* Skill table */}
       <div className="rounded-md border">
@@ -220,8 +206,7 @@ export function SkillCatalogue() {
                 </td>
               </tr>
             )}
-            {!isLoading &&
-              displayedCategories.map((cat) => <CategorySection key={cat.category} category={cat} />)}
+            {!isLoading && displayedCategories.map((cat) => <CategorySection key={cat.category} category={cat} />)}
           </tbody>
         </table>
       </div>

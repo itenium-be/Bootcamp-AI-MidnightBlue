@@ -25,7 +25,11 @@ export function ConsultantProfile({ userId }: ConsultantProfileProps) {
   // 'unset' means not yet changed by user — falls back to consultant.profileId
   const [draftProfileId, setDraftProfileId] = useState<number | null | 'unset'>('unset');
 
-  const { data: consultant, isLoading, isError } = useQuery({
+  const {
+    data: consultant,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ['consultant', userId],
     queryFn: () => fetchConsultant(userId),
   });
