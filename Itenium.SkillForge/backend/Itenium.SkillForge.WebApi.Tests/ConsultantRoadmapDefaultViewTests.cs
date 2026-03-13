@@ -62,7 +62,7 @@ public class ConsultantRoadmapDefaultViewTests : DatabaseTestBase
         await Db.SaveChangesAsync();
     }
 
-    private IReadOnlyList<RoadmapSkillDto> GetSkills(ActionResult<IReadOnlyList<RoadmapCategoryDto>> result)
+    private static List<RoadmapSkillDto> GetSkills(ActionResult<IReadOnlyList<RoadmapCategoryDto>> result)
     {
         var ok = result.Result as OkObjectResult;
         Assert.That(ok, Is.Not.Null);
