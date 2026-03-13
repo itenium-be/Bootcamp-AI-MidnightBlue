@@ -744,6 +744,25 @@ public static class SeedData
             }
         }
 
+        // CoachNicolas — .NET team coach
+        if (await userManager.FindByNameAsync("CoachNicolas") == null)
+        {
+            var user = new ForgeUser
+            {
+                UserName = "CoachNicolas",
+                Email = "nicolas@test.local",
+                EmailConfirmed = true,
+                FirstName = "Nicolas",
+                LastName = "Coach"
+            };
+            var result = await userManager.CreateAsync(user, "Azerty123;");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "manager");
+                await userManager.AddClaimAsync(user, new Claim("team", "2")); // .NET
+            }
+        }
+
         // Learner user — assigned to .NET team so CoachNicolas can manage them
         if (await userManager.FindByEmailAsync("learner@test.local") == null)
         {
